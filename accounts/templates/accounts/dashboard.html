@@ -1,26 +1,29 @@
 {% extends 'base.html' %}
-{% block title %}
-  داشبورد
-{% endblock  %}
 {% block content %}
-<h1>داشبورد</h1>
+<div class="container">
+    <h2>داشبورد {{ user.display_name|default:user.username }}</h2>
 
-<h2>پست‌های اپ Accounts</h2>
-<ul>
-    {% for post in accounts_posts %}
-        <li>{{ post.title }} - {{ post.created_at }}</li>
-    {% empty %}
-        <li>هیچ پستی موجود نیست</li>
-    {% endfor %}
-</ul>
+    <div class="profile">
+        {% if user.avatar %}
+            <img src="{{ user.avatar.url }}" alt="Avatar" width="120" height="120">
+        {% endif %}
+        <p><strong>نام کاربری:</strong> {{ user.username }}</p>
+        <p><strong>تاریخ عضویت:</strong> {{ user.joined_at|date:"Y-m-d" }}</p>
+        <p><strong>تأیید حساب:</strong> {{ user.is_verified|yesno:"بله,خیر" }}</p>
+        {% if user.profile_note %}
+            <p><strong>یادداشت:</strong> {{ user.profile_note }}</p>
+        {% endif %}
+    </div>
 
-<h2>پست‌های وبلاگ (Blog)</h2>
-<ul>
-    {% for post in blog_posts %}
-        <li>{{ post.title }} - {{ post.created_at }}</li>
-    {% empty %}
-        <li>هیچ پستی موجود نیست</li>
-    {% endfor %}
-</ul>
+    <hr>
 
+    <h3>پست‌های شما:</h3>
+    <ul>
+        {% for post in posts %}
+            <li><a href="#">{{ post.title }}</a> ({{ post.created_at|date:"Y-m-d" }})</li>
+        {% empty %}
+            <li>پستی ثبت نکرده‌اید.</li>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock %}

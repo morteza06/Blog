@@ -5,9 +5,12 @@ from django.contrib.auth.models import AbstractUser
 
 class CustomUser(AbstractUser):
     """OR Profile Model----گسترش User با اطلاعات اضافی"""
-    bio = models.TextField(blank=True, null=True)
-    birth_date = models.DateField(blank=True, null=True)
+    display_name = models.CharField(max_length=100, blank=True)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    birth_date = models.DateField(blank=True, null=True) 
+    profile_note = models.TextField(blank=True, help_text="پیام یا توضیح وضعیت")
+    is_verified = models.BooleanField(default=False)
+    joined_at = models.DateTimeField(auto_now_add=True)
 
     # اضافه کردن related_name برای جلوگیری از تداخل با auth.User
     groups = models.ManyToManyField(
@@ -24,6 +27,9 @@ class CustomUser(AbstractUser):
         help_text='Specific permissions for this user.',
         verbose_name='user permissions',
     )
+
+    def __str__(self):
+        return self.username or self.email
 
 
 # مدل نمونه برای پروژه: پست‌ها
