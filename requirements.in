@@ -8,3 +8,4 @@ flake8
 isort 
 mypy 
 bandit
+Pillow

@@ -1,12 +1,18 @@
+from django.conf import settings
 from django.db import models
-from django.contrib.auth.models import User
 
 
 class Post(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    # استفاده از settings.AUTH_USER_MODEL به جای auth.User
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='blog_posts'
+    )
     title = models.CharField(max_length=200)
-    body = models.TextField()
-    created = models.DateTimeField(auto_now_add=True)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.title

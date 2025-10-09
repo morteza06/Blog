@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}
+  وبلاگ
+{% endblock  %}
+{% block content %}
+<h1>صفحه اصلی</h1>
+
+
+<h1>پست‌ها</h1>
+{% if user.is_authenticated %}
+سلام، {{ user.username }} — <a href="{% url 'logout' %}">خروج</a>
+{% else %}
+<a href="{% url 'login' %}">ورود</a> | <a href="{% url 'signup' %}">ثبت‌نام</a>
+{% endif %}
+
+<ul>
+  {% for p in posts %}
+  <li>{{ p.title }} — {{ p.author.username }} — {{ p.created }}</li>
+  {% empty %}
+  <li>پستی وجود ندارد.</li>
+  {% endfor %}
+</ul>
+
+
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}
+  داشبورد
+{% endblock  %}
+{% block content %}
+<h1>داشبورد</h1>
+
+<h2>پست‌های اپ Accounts</h2>
+<ul>
+    {% for post in accounts_posts %}
+        <li>{{ post.title }} - {{ post.created_at }}</li>
+    {% empty %}
+        <li>هیچ پستی موجود نیست</li>
+    {% endfor %}
+</ul>
+
+<h2>پست‌های وبلاگ (Blog)</h2>
+<ul>
+    {% for post in blog_posts %}
+        <li>{{ post.title }} - {{ post.created_at }}</li>
+    {% empty %}
+        <li>هیچ پستی موجود نیست</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

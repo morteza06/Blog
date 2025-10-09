@@ -60,6 +60,7 @@ TEMPLATES = [
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
+                "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
@@ -117,10 +118,22 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
+STATICFILES_DIRS = [
+    BASE_DIR / "static",  # فایل‌های static اصلی پروژه
+]
+
+# مسیر ذخیره سازی فایل های جمع آوری شده collectstatic
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# اگر می‌خواهید رسانه (uploads) کاربر ذخیره شود
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media' 
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
 LOGIN_REDIRECT_URL = "/"      # بعد از لاگین به کجا برود
 LOGOUT_REDIRECT_URL = "/"
+AUTH_USER_MODEL = 'accounts.CustomUser'

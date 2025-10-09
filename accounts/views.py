@@ -6,8 +6,17 @@ from .forms import SignUpForm
 
 @login_required
 def dashboard(request):
-    posts = request.user.posts.all()
-    return render(request, 'accounts/dashboard.html', {'posts': posts})
+    user = request.user
+
+    # دسترسی به پست‌ها به صورت جداگانه
+    accounts_posts = user.accounts_posts.all()  # پست‌های accounts.Post
+    blog_posts = user.blog_posts.all()          # پست‌های blog.Post
+
+    context = {
+        'accounts_posts': accounts_posts,
+        'blog_posts': blog_posts,
+    }
+    return render(request, 'accounts/dashboard.html', {'posts': context})
 
 
 def signup_view(request):
