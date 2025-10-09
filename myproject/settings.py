@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-sofb3jvp+pt1&tw915i7d2t)g=o#&su0q6ev!e*e%5#l5)_q%-"
+SECRET_KEY = "django-insecure-b=5)%&i3r1t3@+o01!dv1y9ytu7=-rhfv6u0j#zr($t-4y1ki+"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "accounts",
+    "blog",
 ]
 
 MIDDLEWARE = [
@@ -47,8 +49,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "accoutns",
-    "blog",
 ]
 
 ROOT_URLCONF = "myproject.urls"
@@ -56,10 +56,11 @@ ROOT_URLCONF = "myproject.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
+                "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
@@ -117,10 +118,22 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
+STATICFILES_DIRS = [
+    BASE_DIR / "static",  # فایل‌های static اصلی پروژه
+]
+
+# مسیر ذخیره سازی فایل های جمع آوری شده collectstatic
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# اگر می‌خواهید رسانه (uploads) کاربر ذخیره شود
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media' 
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
 LOGIN_REDIRECT_URL = "/"      # بعد از لاگین به کجا برود
 LOGOUT_REDIRECT_URL = "/"
+AUTH_USER_MODEL = 'accounts.CustomUser'

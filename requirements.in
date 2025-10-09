@@ -1,5 +1,6 @@
 django
 pytest
+pytest-django
 pip-tools
 pre-commit
 black 
@@ -7,3 +8,4 @@ flake8
 isort 
 mypy 
 bandit
+Pillow
