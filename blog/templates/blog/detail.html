@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>{{ post.title }}</h2>
+<p class="text-muted">{{ post.created_at|date:"Y-m-d H:i" }}</p>
+<div>
+    {{ post.content|safe }}
+</div>
+<a href="{% url 'blog_index' %}">بازگشت به لیست پست‌ها</a>
+{% endblock %}
