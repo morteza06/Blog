@@ -41,7 +41,7 @@
                             {% for post in posts %}
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <div>
-                                        <a href="{% url 'post_detail' post.pk %}"><strong>{{ post.title }}</strong></a><br>
+                                        <a href="{% url 'blog:post_detail' post.slug %}"><strong>{{ post.title }}</strong></a><br>
                                         <small class="text-muted">{{ post.created_at|date:"Y-m-d H:i" }}</small>
                                     </div>
                                     <a href="#" class="btn btn-outline-secondary btn-sm">ویرایش</a>

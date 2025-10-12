@@ -7,6 +7,6 @@ urlpatterns = [
     path("", index, name="home"),  # صفحه اصلی سایت → blog/index.html
     path("admin/", admin.site.urls),
     path("accounts/", include("accounts.urls")),
-    path("blog/", include("blog.urls")),  # اپ اصلی
+    path("blog/", include("blog.urls", namespace="blog")),  # اپ اصلی
     path('dashboard/', dashboard, name='dashboard'),
 ]

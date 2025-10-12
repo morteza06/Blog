@@ -16,15 +16,28 @@
 
 
 <h2>لیست پست‌ها</h2>
-<ul class="list-group">
-    {% for post in posts %}
-        <li class="list-group-item">
-            <a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a>
-            <small class="text-muted">{{ post.created_at|date:"Y-m-d H:i" }}</small>
-        </li>
-      {% empty %}
-      <li>پستی وجود ندارد.</li>
-    {% endfor %}
-</ul>
 
+<ul class="list-group">
+
+  {% for post in page_obj %}
+  <div class="card mb-3">
+    <div class="card-body">
+      <h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
+      <p>{{ post.content|truncatewords:30 }}</p>
+    </div>
+  </div>
+  {% empty %}
+  <p>هیچ پستی ارسال نشده.</p>
+{% endfor %}
+
+<div class="pagination">
+  {% if page_obj.has_previous %}
+  <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+  {% endif %}
+  <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}
+  <a href="?page={{ page_obj.next_page_number }}">Next</a>
+  {% endif %}
+</div>
 {% endblock %}
+</ul>
