@@ -10,4 +10,16 @@ class SignUpForm(UserCreationForm):
 
     class Meta(UserCreationForm.Meta):
         model = User
-        fields = ("username", "email", "password1", "password2")
+        fields = ["username", "email", "password1", "password2"]
+
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["username", "email", "first_name", "last_name"]
+        widgets = {
+            "username": forms.TimeInput(attrs={"class": "form-control"}),
+            "email": forms.EmailInput(attrs={"class": "form-control"}),
+            "first_name": forms.TextInput(attrs={"class": "from-control"}),
+            "last_name": forms.TextInput(attrs={"class": "form-control"})
+        }

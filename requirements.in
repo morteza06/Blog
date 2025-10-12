@@ -9,3 +9,4 @@ isort
 mypy 
 bandit
 Pillow
+django_extensions

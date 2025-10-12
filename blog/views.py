@@ -1,10 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Post
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
+from django.contrib import messages
+from .models import Post
 from .forms import CommentForm, PostForm
+from django.core.paginator import Paginator
 
 
+# صفحه اصلی
 def index(request):
     posts = Post.objects.filter(is_published=True)
     paginator = Paginator(posts, 5)
@@ -13,6 +15,7 @@ def index(request):
     return render(request, "blog/index.html", {"page_obj": page_obj})
 
 
+# جزئیات پست
 def post_detail(request, slug):
     post = get_object_or_404(Post, slug=slug)
     comments = post.comments.filter(approved=True)
@@ -26,6 +29,7 @@ def post_detail(request, slug):
     return render(request, "blog/post_detail.html", {"post": post, "comments": comments, "form": form})
 
 
+# افزودن پست جدید
 @login_required
 def post_create(request):
     form = PostForm(request.POST or None)
@@ -34,5 +38,29 @@ def post_create(request):
         post.author = request.user
         post.save()
         form.save_m2m()
+        messages.success(request, "Post created successfully")
         return redirect(post.get_absolute_url())
     return render(request, "blog/post_form.html", {"form": form})
+
+
+# ویرایش پست
+@login_required
+def post_edit(request, slug):
+    post = get_object_or_404(Post, slug=slug, author=request.user)
+    form = PostForm(request.POST or None, instance=post)
+    if form.is_valid():
+        form.save()
+        messages.info(request, "Post updated successfully.")
+        return redirect(post.get_absolute_url())
+    return render(request, "blog/post_form.html", {"form": form, "title": "Edit Post"})
+
+
+# حذف پست
+@login_required
+def post_delete(request, slug):
+    post = get_object_or_404(Post, slug=slug, author=request.user)
+    if request.method == "POST":
+        post.delete()
+        messages.warning(request, "Post deleted.")
+        return redirect("blog:index")
+    return render(request, "blog/post_confirm_delete.html", {"post": post})

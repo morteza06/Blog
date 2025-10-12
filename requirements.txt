@@ -27,6 +27,10 @@ colorama==0.4.6
 distlib==0.4.0
     # via virtualenv
 django==5.2.7
+    # via
+    #   -r requirements.in
+    #   django-extensions
+django-extensions==4.1
     # via -r requirements.in
 filelock==3.19.1
     # via virtualenv

@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from .forms import SignUpForm
+from django.contrib.auth import login
+from django.contrib import messages
+from .forms import SignUpForm, ProfileForm
 
 
 @login_required
@@ -21,3 +22,13 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, "accounts/signup.html", {"form": form})
+
+
+@login_required
+def profile_edit(request):
+    form = ProfileForm(request.POST or None, instance=request)
+    if form.is_valid():
+        form.save()
+        messages.success(request, "Profile updated successfully.")
+        return redirect("accounts:Profile_edit")
+    return render(request, "accounts/profile_edit.html", {"form": form})

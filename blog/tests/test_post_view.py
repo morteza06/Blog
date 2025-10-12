@@ -9,6 +9,6 @@ User = get_user_model()
 def test_index_view_displays_posts(client):
     user = User.objects.create_user(username='writer', password='12345')
     Post.objects.create(title='Post 1', content='Hello world', author=user)
-    response = client.get(reverse('index'))
+    response = client.get(reverse('blog:index'))
     assert response.status_code == 200
     assert b'Post 1' in response.content

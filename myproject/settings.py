@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "accounts",
     "blog",
+    "django_extensions",
 ]
 
 MIDDLEWARE = [
@@ -134,6 +135,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-LOGIN_REDIRECT_URL = "/"      # بعد از لاگین به کجا برود
-LOGOUT_REDIRECT_URL = "/"
 AUTH_USER_MODEL = 'accounts.CustomUser'
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'home'      # بعد از لاگین به کجا برود
+LOGOUT_REDIRECT_URL = 'home'
