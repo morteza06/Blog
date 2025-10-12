@@ -1,7 +1,7 @@
-from django.db import models
 from django.conf import settings
-from django.utils.text import slugify
+from django.db import models
 from django.urls import reverse
+from django.utils.text import slugify
 
 
 class Tag(models.Model):
@@ -20,9 +20,7 @@ class Tag(models.Model):
 class Post(models.Model):
     # استفاده از settings.AUTH_USER_MODEL به جای auth.User
     author = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='posts'
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="posts"
     )
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200)
@@ -33,7 +31,7 @@ class Post(models.Model):
     is_published = models.BooleanField(default=True)
 
     class Meta:
-        ordering = ['created_at']
+        ordering = ["created_at"]
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -44,7 +42,7 @@ class Post(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        return reverse('blog:post_detail', args=[self.slug])
+        return reverse("blog:post_detail", args=[self.slug])
 
 
 class Comment(models.Model):

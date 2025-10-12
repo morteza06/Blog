@@ -1,9 +1,10 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Post
-from .forms import CommentForm, PostForm
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.shortcuts import get_object_or_404, redirect, render
+
+from .forms import CommentForm, PostForm
+from .models import Post
 
 
 # صفحه اصلی
@@ -26,7 +27,11 @@ def post_detail(request, slug):
         comment.user = request.user
         comment.save()
         return redirect("blog:post_detail", slug=slug)
-    return render(request, "blog/post_detail.html", {"post": post, "comments": comments, "form": form})
+    return render(
+        request,
+        "blog/post_detail.html",
+        {"post": post, "comments": comments, "form": form},
+    )
 
 
 # افزودن پست جدید

@@ -3,10 +3,10 @@ pytest
 pytest-django
 pip-tools
 pre-commit
-black 
-flake8 
-isort 
-mypy 
+black
+flake8
+isort
+mypy
 bandit
 Pillow
 django_extensions

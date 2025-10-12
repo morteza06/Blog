@@ -127,15 +127,15 @@ STATICFILES_DIRS = [
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # اگر می‌خواهید رسانه (uploads) کاربر ذخیره شود
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media' 
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-AUTH_USER_MODEL = 'accounts.CustomUser'
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'home'      # بعد از لاگین به کجا برود
-LOGOUT_REDIRECT_URL = 'home'
+AUTH_USER_MODEL = "accounts.CustomUser"
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "home"  # بعد از لاگین به کجا برود
+LOGOUT_REDIRECT_URL = "home"

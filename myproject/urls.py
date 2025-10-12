@@ -1,12 +1,13 @@
 from django.contrib import admin
-from django.urls import path, include
-from blog import views as blog_views
+from django.urls import include, path
+
 from accounts.views import dashboard
+from blog import views as blog_views
 
 urlpatterns = [
     path("", blog_views.index, name="home"),  # صفحه اصلی سایت → blog/index.html
     path("admin/", admin.site.urls),
     path("accounts/", include("accounts.urls")),
     path("blog/", include("blog.urls", namespace="blog")),  # اپ اصلی
-    path('dashboard/', dashboard, name='dashboard'),
+    path("dashboard/", dashboard, name="dashboard"),
 ]
