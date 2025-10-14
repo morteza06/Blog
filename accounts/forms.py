@@ -56,3 +56,4 @@ class ProfileEditForm(forms.ModelForm):
                 }
             ),
         }
+        # TODO: در آینده اعتبارسنجی ایمیل تکراری یا فرمت تاریخ را اضافه کنیم

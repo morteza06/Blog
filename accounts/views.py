@@ -3,6 +3,8 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
+from blog.models import Post
+
 from .forms import ProfileEditForm, SignUpForm
 
 
@@ -12,9 +14,17 @@ def dashboard(request):
     کاربر وارد شده را به داشبورد خودش هدایت می‌کند
     """
     user = request.user
-    posts = user.posts.all()  # دسترسی به پست‌ها
+    posts = Post.objects.filter(author=user)
+    context = {
+        "section": "dashboard",
+        "display_name": user.display_name or user.username,
+        "avatar": user.avatar.url if user.avatar else None,
+        "birth_date": user.birth_date,
+        "profile_note": user.profile_note,
+        "posts": posts,
+    }
     # TODO: اضافه کردن بخش نمایش فعالیت‌های اخیر کاربر (مثلاً پست‌های اخیر یا پیام‌ها)
-    return render(request, "accounts/dashboard.html", {"user": user, "posts": posts})
+    return render(request, "accounts/dashboard.html", context)
 
 
 def signup(request):
@@ -31,6 +41,9 @@ def signup(request):
 
 @login_required
 def profile_edit(request):
+    """
+    صفحه ویرایش پروفایل کاربر جاری
+    """
     user = request.user
     if request.method == "POST":
         form = ProfileEditForm(request.POST, request.FILES, instance=user)
@@ -40,4 +53,8 @@ def profile_edit(request):
             return redirect("dashboard")
     else:
         form = ProfileEditForm(instance=user)
-    return render(request, "accounts/profile_edit.html", {"form": form})
+    context = {
+        "form": form,
+        "section": "profile_edit",
+    }
+    return render(request, "accounts/profile_edit.html", context)

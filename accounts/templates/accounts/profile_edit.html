@@ -3,9 +3,15 @@
 {% block content %}
 <div class="container" style="max-width:600px; margin:auto;">
   <h2>Edit Profile</h2>
+
   <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
+    {% if user.avatar %}
+      <p>Current avatar:</p>
+      <img src="{{ user.avatar.url }}" width="100" height="100" alt="Avatar">
+    {% endif %}
+
     <button type="submit" style="padding:10px 20px; background:#2563eb; color:white; border:none; border-radius:6px;">
       💾 Save Changes
     </button>
@@ -15,4 +21,5 @@
     <a href="{% url 'dashboard' %}" style="color:#2563eb;">← Back to Dashboard</a>
   </div>
 </div>
+<!-- TODO: اضافه کردن اسکریپت برای پیش‌نمایش فوری تصویر آواتار -->
 {% endblock %}

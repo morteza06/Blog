@@ -6,7 +6,7 @@
 <h1>صفحه اصلی</h1>
 
 
-<h1>پست‌ها</h1>
+<h2>پست‌ها</h2>
 {% if user.is_authenticated %}
   سلام، {{ user.username }} — <a href="{% url 'logout' %}">خروج</a>
 {% else %}
@@ -15,7 +15,7 @@
 
 
 
-<h2>لیست پست‌ها</h2>
+<h5>لیست پست‌ها</h5>
 
 <ul class="list-group">
 

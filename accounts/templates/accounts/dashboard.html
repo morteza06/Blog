@@ -10,21 +10,21 @@
         <div class="col-md-4">
             <div class="card shadow-sm">
                 <div class="card-body text-center">
-                    {% if user.avatar %}
-                        <img src="{{ user.avatar.url }}" class="rounded-circle mb-3" width="120" height="120">
+                    {% if avatar %}
+                        <img src="{{ user.avatar.url }}" alt="{{ display_name}}" class="rounded-circle mb-3" width="120" height="120">
                     {% else %}
                         <img src="{% static 'images\default-avatar.png' %}" class="rounded-circle mb-3" width="120" height="120">
                     {% endif %}
                     <ul>
                         <li><h5>{{ user.display_name|default:user.username }}</h5></li>
-                        <li><strong>Full name:</strong> {{ user.first_name }} {{ user.last_name }}</li>
+                        <li><strong>Full name:</strong> {{ first_name }} {{ last_name }}</li>
                         <li><p class="text-muted">{{ user.email }}</p></li>
                         <hr>
                         <li><p><strong>عضویت:</strong> {{ user.joined_at|date:"Y-m-d" }}</p></li>
-                        <li><p><strong>Profile note:</strong> {{ user.profile_note }}</p></li>
-                        <li><p><strong>تأیید حساب:</strong> {% if user.is_verified %}✅{% else %}⏳{% endif %}</p></li>
-                        {% if user.profile_note %}
-                            <p class="mt-3">{{ user.profile_note }}</p>
+                        <li><p><strong>Profile note:</strong> {{ profile_note }}</p></li>
+                        <li><p><strong>تأیید حساب:</strong> {% if is_verified %}✅{% else %}⏳{% endif %}</p></li>
+                        {% if profile_note %}
+                            <p class="mt-3">{{ profile_note }}</p>
                         {% endif %}
 
                     </ul>

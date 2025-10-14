@@ -9,7 +9,7 @@ from .models import Post
 
 # صفحه اصلی
 def index(request):
-    posts = Post.objects.filter(is_published=True)
+    posts = Post.objects.filter(status="published").order_by("-created_at")
     paginator = Paginator(posts, 5)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
