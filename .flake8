@@ -1,2 +1,9 @@
 [flake8]
+exclude =
+    migrations,
+    __pycache__,
+    manage.py,
+    .venv,
+    static,
+    media
 max-line-length = 120

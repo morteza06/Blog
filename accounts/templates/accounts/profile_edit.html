@@ -1,11 +1,18 @@
-{% extends 'base.html' %}
-
+{% extends "base.html" %}
+{% block title %}Edit Profile{% endblock %}
 {% block content %}
-<h2>Edit Profile</h2>
-<form  method="post">
+<div class="container" style="max-width:600px; margin:auto;">
+  <h2>Edit Profile</h2>
+  <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
-    {{form.as_p}}
-    <button type="submit" class="btn btn-success">Save Changes</button>
-</form>
+    {{ form.as_p }}
+    <button type="submit" style="padding:10px 20px; background:#2563eb; color:white; border:none; border-radius:6px;">
+      💾 Save Changes
+    </button>
+  </form>
 
-{% endblock content %}
+  <div style="margin-top:20px;">
+    <a href="{% url 'dashboard' %}" style="color:#2563eb;">← Back to Dashboard</a>
+  </div>
+</div>
+{% endblock %}

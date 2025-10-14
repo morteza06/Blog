@@ -7,7 +7,7 @@ class CustomUser(AbstractUser):
     """OR Profile Model----گسترش User با اطلاعات اضافی"""
 
     display_name = models.CharField(max_length=100, blank=True)
-    avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
+    avatar = models.ImageField(upload_to="images/avatars/", blank=True, null=True)
     birth_date = models.DateField(blank=True, null=True)
     profile_note = models.TextField(blank=True, help_text="پیام یا توضیح وضعیت")
     is_verified = models.BooleanField(default=False)
