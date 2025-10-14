@@ -10,7 +10,9 @@ User = get_user_model()
 @pytest.mark.django_db
 def test_index_view_displays_posts(client):
     user = User.objects.create_user(username="writer", password="12345")
-    Post.objects.create(title="Post 1", content="Hello world", author=user)
-    response = client.get(reverse("blog:index"))
+    Post.objects.create(
+        title="Post 1", content="Hello world", author=user, status="published"
+    )
+    response = client.get(reverse("home"))
     assert response.status_code == 200
-    assert b"Post 1" in response.content
+    assert "Post 1" in response.content.decode()
