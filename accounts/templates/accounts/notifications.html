@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>اطلاع رسانی</h3>
+<ul class="list-group">
+  {% for n in notifications %}
+    <li class="list-group-item">
+      <strong>{{ n.title }}</strong> — {{ n.message }} <small class="text-muted">({{ n.created_at|date:"Y-m-d H:i" }})</small>
+      {% if not n.read %}
+        <a href="{% url 'notification_mark_read' n.pk %}" class="btn btn-sm btn-outline-primary float-end">علامت خوانده شده</a>
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>
+{% endblock %}

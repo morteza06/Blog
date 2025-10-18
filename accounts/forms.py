@@ -1,6 +1,9 @@
+import datetime
+
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
+from django.core.exceptions import ValidationError
 
 from .models import CustomUser
 
@@ -44,7 +47,14 @@ class ProfileEditForm(forms.ModelForm):
             "last_name": forms.TextInput(attrs={"class": "form-control"}),
             "display_name": forms.TextInput(attrs={"class": "form-control"}),
             "avatar": forms.ClearableFileInput(attrs={"class": "form-control"}),
-            "birth_data": forms.DateInput(attrs={"class": "form", "type": "date"}),
+            "birth_data": forms.DateInput(
+                attrs={
+                    "class": "form-control",
+                    "type": "date",
+                    "min": "1900-01-01",
+                    "max": datetime.date.today().isoformat(),  # تاریخ امروز
+                }
+            ),
             "email": forms.EmailInput(
                 attrs={"class": "form-control", "placeholder": "Email address"}
             ),
@@ -56,4 +66,26 @@ class ProfileEditForm(forms.ModelForm):
                 }
             ),
         }
-        # TODO: در آینده اعتبارسنجی ایمیل تکراری یا فرمت تاریخ را اضافه کنیم
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        if email:
+            # (فاصله، حروف بزرگ/کوچک، فضاهای اضافی)  error finding
+            email_normalized = email.strip().lower()
+            # بررسی تکراری بودن ایمیل برای کاربران دیگر
+            qs = User.objects.filter(email__iexact=email_normalized).exclude(
+                pk=self.instance.pk
+            )
+            if qs.exists():
+                raise forms.ValidationError("این ایمیل قبلا استفاده شده است.  ")
+            return email_normalized
+        return email
+
+    def clean_birth_date(self):
+        bd = self.cleaned_data.get("birth_date")
+        if bd:
+            if bd > datetime.date.today():
+                raise ValidationError("تاریخ تولد نمی‌تواند بزرگتر از امروز باشد.")
+            if bd < datetime.date(1900, 1, 1):
+                raise ValidationError("تاریخ تولد باید بعد از سال 1900 باشد.")
+        return bd

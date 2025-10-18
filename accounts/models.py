@@ -47,3 +47,28 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Notification(models.Model):
+    NOTIF_TYPE_CHOICES = [
+        ("info", "Info"),
+        ("system", "System"),
+        ("comment", "Comment"),
+        ("post", "Post"),
+    ]
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications"
+    )
+    title = models.CharField(max_length=200)
+    message = models.TextField(blank=True)
+    notif_type = models.CharField(
+        choices=NOTIF_TYPE_CHOICES, max_length=20, default="info"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.title} → {self.user}"

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+<div class="container" style="max-width:600px; margin:auto;">
+  <h2> Profile</h2>
+    {% csrf_token %}
+    <p>Username:</p>
+    <p>{{ profileuser.username }}</p>
+    <hr>
+    <ul>
+        {% for p in posts %}
+            <li>
+                {{ p.title }}  |  {{ p.content }} |  {{ p.created_at }}  |   {{ p.updated_at }}  |  {{ p.published_at }}  |   {{ p.tags }}
+            </li>
+            <li>[[[[</li>
+        {% endfor %}
+    </ul>
+
+
+  <div style="margin-top:20px;">
+    <a href="{% url 'dashboard' %}" style="color:#2563eb;">← Back to Dashboard</a>
+  </div>
+</div>
+{% endblock %}

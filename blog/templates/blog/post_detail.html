@@ -1,9 +1,49 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>{{ post.title }}</h2>
-<p class="text-muted">{{ post.created_at|date:"Y-m-d H:i" }}</p>
-<div>
-    {{ post.content|safe }}
-</div>
-<a href="{% url 'home' %}">بازگشت به لیست پست‌ها</a>
+<article>
+    <h2>{{ post.title }}</h2>
+    <div>
+        {{ post.content|safe }}
+    </div>
+    <div>
+        <p class="text-muted">By
+            <a href="{% url 'profile' post.author.username %}">
+                {{ post.author.display_name|default:post.author.username }}</a>
+             • {{ post.created_at|date:"Y-m-d H:i" }}</p>
+
+             {% if post.tags.all %}
+             <p>Tags:
+
+                {% for t in post.tags.all %}
+                    <a href="{% url 'blog:tagged' t.slug %}">#{{ t.name }}</a>
+                    {% if not forloop.last %}
+                        ,
+                    {% endif %}
+                {% endfor %}
+             </p>
+             {% endif %}
+    </div>
+    <hr>
+    <p>Updated: {{ post.updated_at|date:"Y-m-d H:i"}}</p>
+    <p>Published: {{ post.published_at|date:"Y-m-d H:i" }}</p>
+    <hr>
+    <h3>نظرات کاربران</h3>
+    {% for comment in comments %}
+        <div class="border rounded p-2 mb-2">
+            <p>{{ comment.content }}</p>
+            <small>
+            {% if comment.author %}
+                نویسنده: {{ comment.author.display_name|default:comment.author.username }}
+                تاریخ ایجاد:  {{ comment.created_at|date:"Y/m/d H:i" }}
+            {% else %}
+                نویسنده ناشناس
+            {% endif %}
+            </small>
+        </div>
+        {% empty %}
+        <p>هنوز نظری برای این پست ثبت نشده است.</p>
+    {% endfor %}
+    <a href="{% url 'blog:home' %}">بازگشت به لیست پست‌ها</a>
+
+</article>
 {% endblock %}

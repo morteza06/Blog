@@ -13,6 +13,6 @@ def test_index_view_displays_posts(client):
     Post.objects.create(
         title="Post 1", content="Hello world", author=user, status="published"
     )
-    response = client.get(reverse("home"))
+    response = client.get(reverse("blog:post_list"))
     assert response.status_code == 200
     assert "Post 1" in response.content.decode()
