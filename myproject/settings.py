@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "landing",
     "accounts",
     "blog",
     "django_extensions",
@@ -137,5 +138,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "accounts.CustomUser"
 LOGIN_URL = "login"
-LOGIN_REDIRECT_URL = "home"  # بعد از لاگین به کجا برود
-LOGOUT_REDIRECT_URL = "home"
+LOGIN_REDIRECT_URL = "blog:home"  # بعد از لاگین به کجا برود
+LOGOUT_REDIRECT_URL = "blog:home"

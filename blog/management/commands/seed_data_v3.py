@@ -67,7 +67,7 @@ class Command(BaseCommand):
             for _ in range(random.randint(1, 4)):
                 Comment.objects.create(
                     post=post,
-                    user=random.choice(users),
+                    author=random.choice(users),
                     content="This is a sample comment on " + post.title,
                     created_at=timezone.now(),
                 )

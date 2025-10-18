@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="text-center mt-5">
+  <h1>به سایت وبلاگ خوش آمدید 🌿</h1>
+  <p class="lead">در اینجا می‌توانید پست‌ها را بخوانید، نظر بدهید و حساب کاربری بسازید.</p>
+
+  {% if user.is_authenticated %}
+    <p>سلام {{ user.display_name|default:user.username }}! <a href="{% url 'logout' %}">خروج</a></p>
+    <p><a href="{% url 'blog:post_list' %}" class="btn btn-primary">رفتن به وبلاگ</a></p>
+    <p><a href="{% url 'dashboard' %}" class="btn btn-secondary">مشاهده داشبورد</a></p>
+  {% else %}
+    <p><a href="{% url 'login' %}" class="btn btn-success">ورود</a> یا
+       <a href="{% url 'signup' %}" class="btn btn-outline-info">ثبت‌نام</a></p>
+  {% endif %}
+</div>
+
+{% endblock %}

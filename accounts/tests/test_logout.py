@@ -10,4 +10,4 @@ def test_user_can_logout(client, django_user_model):
     response = client.post(url)
     # NOTE: اگر next_page='home' در LogoutView تنظیم شده باشد:
     assert response.status_code == 302
-    assert response.url == reverse("home")
+    assert response.url == reverse("blog:home")

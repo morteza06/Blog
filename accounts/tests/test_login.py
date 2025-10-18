@@ -8,4 +8,4 @@ def test_user_can_login(client, django_user_model):
     url = reverse("login")
     response = client.post(url, {"username": "john", "password": "secret123"})
     assert response.status_code == 302
-    assert response.url == reverse("home")
+    assert response.url == reverse("blog:home")
