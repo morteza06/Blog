@@ -9,7 +9,7 @@ from accounts.views import dashboard
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", include("landing.urls")),  # صفحه اصلی سایت
+    path("", include("landing.urls"), name="landing"),  # صفحه اصلی سایت
     path("accounts/", include("accounts.urls")),
     path("blog/", include("blog.urls", namespace="blog")),  # اپ اصلی
     path("dashboard/", dashboard, name="dashboard"),

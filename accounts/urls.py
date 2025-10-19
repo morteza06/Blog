@@ -16,12 +16,12 @@ urlpatterns = [
     ),
     path("signup/", views.signup, name="signup"),
     path("dashboard/", views.dashboard, name="dashboard"),
-    path("edit/", views.profile_edit, name="profile_edit"),
+    path("profile/edit/", views.profile_edit, name="profile_edit"),
+    path("profile/<str:username>/", views.profile_view, name="profile"),
     path("notifications/", views.notifications_list, name="notifications"),
     path(
         "notifications/mark_read/<int:pk>/",
         views.notification_mark_read,
         name="notification_mark_read",
     ),
-    path("profile/<str:username>/", views.profile_view, name="profile"),
 ]

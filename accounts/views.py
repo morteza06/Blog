@@ -1,9 +1,11 @@
 from django.contrib import messages
-from django.contrib.auth import login
+from django.contrib.auth import get_user_model, login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import ProfileEditForm, SignUpForm
+
+# from .models import CustomUser
 
 
 @login_required
@@ -67,10 +69,11 @@ def profile_edit(request):
         form = ProfileEditForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             form.save()
-            messages.success(request, "Profile updated successfully.")
+            messages.success(request, "پروفایل با موفقیت ویرایش شد ✅")
             return redirect("dashboard")
         else:
             print("Form errors:", form.errors)
+            messages.error(request, "خطا در ویرایش اطلاعات ❌")
     else:
         form = ProfileEditForm(instance=user)
     context = {
@@ -80,9 +83,19 @@ def profile_edit(request):
     return render(request, "accounts/profile_edit.html", context)
 
 
+User = get_user_model()
+
+
+@login_required
 def profile_view(request, username):
-    user = get_object_or_404(request.user, username=username)
-    posts = user.posts.all().order_by("-created_at")[:10]
+    """
+    نمایش پروفایل کاربر جاری یا هر کاربر دیگر
+    """
+    # User = request.user
+    user = get_object_or_404(User, username=username)
+    posts = (
+        user.posts.all().order_by("-created_at")[:10] if hasattr(user, "posts") else []
+    )
     return render(
         request, "accounts/profile.html", {"profile_user": user, "posts": posts}
     )

@@ -1,18 +1,19 @@
 {% extends "base.html" %}
-{% block title %}Profile{% endblock %}
+{% block title %}پروفایل {% endblock %}
 {% block content %}
 <div class="container" style="max-width:600px; margin:auto;">
-  <h2> Profile</h2>
+  <h2> پروفایل </h2>
     {% csrf_token %}
-    <p>Username:</p>
+    <p>کاربر جاری:</p>
     <p>{{ profileuser.username }}</p>
     <hr>
     <ul>
         {% for p in posts %}
             <li>
-                {{ p.title }}  |  {{ p.content }} |  {{ p.created_at }}  |   {{ p.updated_at }}  |  {{ p.published_at }}  |   {{ p.tags }}
+               عنوان:    {{ p.title }} <br> محتوی:    {{ p.content }} <br> تاریخ ایجاد :    {{ p.created_at }}  <br>
+               تاریخ بروزرسانی :   {{ p.updated_at }}  <br> تاریخ انتشار :    {{ p.published_at }}  <br>  تگ ها:    {{ p.tags }}
+               <hr>
             </li>
-            <li>[[[[</li>
         {% endfor %}
     </ul>
 
