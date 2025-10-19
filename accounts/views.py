@@ -98,7 +98,7 @@ def notifications_list(request):
 
 @login_required
 def notification_mark_read(request, pk):
-    n = get_object_or_404(request.user.notifictaion, pk=pk)
+    n = get_object_or_404(request.user.notifications, pk=pk)
     n.read = True
     n.save()
     return redirect("notifications")
