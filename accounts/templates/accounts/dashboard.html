@@ -26,8 +26,11 @@
     <div class="row">
 
         <!-- پروفایل کاربر -->
-        <div class="col-lg-4 col-md-6 mb-3">
-            <div class="card shadow-sm p-3 h-100">
+        <div class="col-lg-4 col-md-6">
+            <div class="card shadow-sm p-3 h-100 border-primary">
+                <div class="text-center mb-3 text-primary">
+                    <i class="bi bi-person-circle" style="font-size:2rem;"></i>
+                </div>
                 <div class="text-center mb-3">
                     {% if avatar %}
                         <img src="{{ user.avatar.url }}" alt="{{ display_name }}" class="rounded-circle" width="120" height="120">
@@ -43,14 +46,19 @@
                     <li><strong>Profile note:</strong> {{ profile_note|default:"بدون یادداشت" }}</li>
                     <li><strong>تأیید حساب:</strong> {% if is_verified %}✅{% else %}⏳{% endif %}</li>
                 </ul>
-                <button class="btn btn-primary w-100 mt-3" data-bs-toggle="modal" data-bs-target="#editProfileModal">ویرایش پروفایل ✏️</button>
+                <button class="btn btn-primary w-100 mt-3" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                    <i class="bi bi-pencil-square"></i> ویرایش پروفایل
+                </button>
             </div>
         </div>
 
-        <!-- آمار فعالیت‌ها -->
-        <div class="col-lg-4 col-md-6 mb-3">
-            <div class="card shadow-sm p-3 h-100">
-                <h4>آمار فعالیت‌ها</h4>
+       <!-- آمار فعالیت‌ها -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card shadow-sm p-3 h-100 border-success">
+                <div class="d-flex align-items-center mb-2 text-success">
+                    <i class="bi bi-bar-chart-line me-2" style="font-size:1.5rem;"></i>
+                    <h4 class="m-0">آمار فعالیت‌ها</h4>
+                </div>
                 <ul>
                     <li>تعداد کل پست‌ها: {{ total_posts }}</li>
                     {% if last_post %}
@@ -62,33 +70,43 @@
             </div>
         </div>
 
+
         <!-- اعلان‌ها -->
-        <div class="col-lg-4 col-md-12 mb-3">
-            <div class="card shadow-sm p-3 h-100">
-                <h4>اعلان‌ها 🔔</h4>
+        <div class="col-lg-4 col-md-12">
+            <div class="card shadow-sm p-3 h-100 border-warning">
+                <div class="d-flex align-items-center mb-2 text-warning">
+                    <i class="bi bi-bell me-2" style="font-size:1.5rem;"></i>
+                    <h4 class="m-0">اعلان‌ها</h4>
+                </div>
                 <ul class="list-unstyled">
                     {% for n in notifications %}
-                        <li class="{% if not n.read %}fw-bold{% endif %} mb-2">
-                            <small>{{ n.created_at|timesince }} ago</small><br>
-                            {{ n.title }} — {{ n.message|truncatechars:80 }}
+                        <li class="d-flex justify-content-between align-items-start mb-2 {% if not n.read %}fw-bold{% endif %}">
+                            <div>
+                                {{ n.title }} — {{ n.message|truncatechars:80 }}<br>
+                                <small class="text-muted">{{ n.created_at|timesince }} ago</small>
+                            </div>
+                            {% if not n.read %}
+                                <span class="badge bg-danger rounded-pill">جدید</span>
+                            {% endif %}
                         </li>
                     {% empty %}
                         <li>هیچ اعلانی ندارید.</li>
                     {% endfor %}
                 </ul>
-                <a href="{% url 'notifications' %}">مشاهده همه اعلان‌ها</a>
+                <a href="{% url 'notifications' %}" class="text-decoration-none">مشاهده همه اعلان‌ها</a>
             </div>
         </div>
 
     </div> <!-- row -->
 
-    <div class="row mt-3">
+    <div class="row g-3 mt-3">
 
-        <!-- پست‌ها -->
-        <div class="col-lg-8 mb-3">
-            <div class="card shadow-sm h-100">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5>پست‌های شما</h5>
+
+          <!-- پست‌ها -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm h-100 border-secondary">
+                <div class="card-header d-flex justify-content-between align-items-center bg-secondary text-white">
+                    <h5><i class="bi bi-pencil-square me-2"></i>پست‌های شما</h5>
                     <a href="{% url 'blog:post_create' %}" class="btn btn-sm btn-success">➕ پست جدید</a>
                 </div>
                 <div class="card-body">
@@ -100,7 +118,9 @@
                                         <a href="{% url 'blog:post_detail' post.slug %}"><strong>{{ post.title }}</strong></a><br>
                                         <small class="text-muted">{{ post.created_at|date:"Y-m-d H:i" }}</small>
                                     </div>
-                                    <a href="{% url 'blog:post_edit' post.slug %}" class="btn btn-outline-secondary btn-sm">ویرایش</a>
+                                    <a href="{% url 'blog:post_edit' post.slug %}" class="btn btn-outline-secondary btn-sm">
+                                        <i class="bi bi-pencil-square"></i> ویرایش
+                                    </a>
                                 </li>
                             {% endfor %}
                         </ul>
@@ -111,10 +131,13 @@
             </div>
         </div>
 
-        <!-- فعالیت‌های اخیر -->
-        <div class="col-lg-4 mb-3">
-            <div class="card shadow-sm p-3 h-100">
-                <h5>فعالیت‌های اخیر</h5>
+           <!-- فعالیت‌های اخیر -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm p-3 h-100 border-info">
+                <div class="d-flex align-items-center mb-2 text-info">
+                    <i class="bi bi-clock-history me-2" style="font-size:1.5rem;"></i>
+                    <h5 class="m-0">فعالیت‌های اخیر</h5>
+                </div>
                 <ul class="list-group list-group-flush">
                     {% for act in activities %}
                         <li class="list-group-item d-flex justify-content-between align-items-start">
@@ -145,7 +168,7 @@
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editProfileLabel">ویرایش پروفایل ✏️</h5>
+                    <h5 class="modal-title" id="editProfileLabel"><i class="bi bi-pencil-square me-2"></i>ویرایش پروفایل</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
