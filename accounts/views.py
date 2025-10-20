@@ -2,10 +2,9 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
 from .forms import ProfileEditForm, SignUpForm
-
-# from .models import CustomUser
 
 
 @login_required
@@ -16,6 +15,9 @@ def dashboard(request):
     user = request.user
     # آخرین پست‌های نویسنده (۵ تا)
     recent_posts = user.posts.all().order_by("-created_at")[:5]
+    # تعداد کل پست‌ها
+    total_posts = user.posts.filter(author=user).count()
+
     # نوتیفیکیشن‌های کاربر (خوانده نشده قبل از همه)
     notifications = user.notifications.all()[:8]  # تعداد قابل تنظیم
     # فعالیت‌های اخیر ترکیبی: هم پست و هم نوتیفیکیشن (می‌توان merge کرد)
@@ -39,10 +41,42 @@ def dashboard(request):
                 "message": n.message,
             }
         )
+
+    now = timezone.now()
+    # تعیین پیام خوش‌آمدگویی بر اساس ساعت روز
+    hour = now.hour
+    if hour < 12:
+        greeting = "صبح بخیر"
+    elif 12 <= hour < 18:
+        greeting = "عصر بخیر"
+    else:
+        greeting = "شب بخیر"
+
+    # اعلان‌ها — بعداً از مدل Notification خوانده می‌شود
+    notifications = [
+        {"message": "پیام جدید از مدیر", "time": "۱ دقیقه پیش"},
+        {"message": "پست شما تأیید شد", "time": "۱۰ دقیقه پیش"},
+    ]
+
+    # استفاده از فرم با modal form
+    form = ProfileEditForm(instance=user)
+
+    if request.method == "POST":
+        form = ProfileEditForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "پروفایل با موفقیت ویرایش شد ✅")
+            return redirect("dashboard")  # مهم برای نمایش پیام
+        else:
+            messages.error(request, "خطا در ویرایش اطلاعات ❌")
+
     context = {
+        "greeting": greeting,
         "recent_posts": recent_posts,
+        "total_posts": total_posts,
         "notifications": notifications,
         "activities": activities,
+        "form": form,
     }
     return render(request, "accounts/dashboard.html", context)
 
@@ -57,30 +91,6 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, "accounts/signup.html", {"form": form})
-
-
-@login_required
-def profile_edit(request):
-    """
-    صفحه ویرایش پروفایل کاربر جاری
-    """
-    user = request.user
-    if request.method == "POST":
-        form = ProfileEditForm(request.POST, request.FILES, instance=user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "پروفایل با موفقیت ویرایش شد ✅")
-            return redirect("dashboard")
-        else:
-            print("Form errors:", form.errors)
-            messages.error(request, "خطا در ویرایش اطلاعات ❌")
-    else:
-        form = ProfileEditForm(instance=user)
-    context = {
-        "form": form,
-        "section": "profile_edit",
-    }
-    return render(request, "accounts/profile_edit.html", context)
 
 
 User = get_user_model()

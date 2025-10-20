@@ -1,103 +1,161 @@
 {% extends 'base.html' %}
 {% load static %}
 
-
 {% block content %}
-
 <div class="container mt-4">
+    <!-- نمایش پیام ها  -->
+    {% if messages %}
+    <div class="mb-3">
+        {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- خوش آمدگویی -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <h2>{{ greeting }}، {{ user.username }} 👋</h2>
+            <p>خوش آمدی به داشبورد شخصی‌ات.</p>
+        </div>
+    </div>
+
     <div class="row">
-        <!-- پروفایل -->
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card mb-3 p-3">
+
+        <!-- پروفایل کاربر -->
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card shadow-sm p-3 h-100">
+                <div class="text-center mb-3">
                     {% if avatar %}
-                        <img src="{{ user.avatar.url }}" alt="{{ display_name}}" class="rounded-circle mb-3" width="120" height="120">
+                        <img src="{{ user.avatar.url }}" alt="{{ display_name }}" class="rounded-circle" width="120" height="120">
                     {% else %}
-                        <img src="{% static 'images\default-avatar.png' %}" class="rounded-circle mb-3" width="120" height="120">
+                        <img src="{% static 'images/default-avatar.png' %}" class="rounded-circle" width="120" height="120">
                     {% endif %}
-
-                        <h5>{{ user.display_name|default:user.username }}</h5>
-                        <strong>Full name:</strong> {{ user.first_name }} ,{{ user.last_name }}
-                        <strong>Emai:</strong>{{ user.email }}
-
-
-                        <hr>
-                        <p><strong>عضویت:</strong> {{ user.joined_at|date:"Y-m-d" }}</p>
-                        <p><strong>Profile note:</strong> {{ profile_note|default:"بدون یادداشت "}}</p>
-                        <p><strong>تأیید حساب:</strong> {% if is_verified %}✅{% else %}⏳{% endif %}</p>
-                        {% if profile_note %}
-                            <p class="mt-3">{{ profile_note }}</p>
-                        {% endif %}
-
-
-                   <a href="{% url 'profile_edit' %}" style="background:#f59e0b; padding:8px 16px; color:white; border-radius:6px;">✏️ویرایش پروفایل</a>
                 </div>
-                <!-- Notifications -->
-                <div class="card p-3">
-                    <h5>اطلاع رسانی</h5>
-                    <ul class="list-unstyled">
-                        {% for n in notifications %}
-                        <li class="{% if not n.read %}fw-bold{% endif %}">
+                <h5 class="text-center">{{ user.display_name|default:user.username }}</h5>
+                <ul class="list-unstyled mt-2">
+                    <li><strong>Full name:</strong> {{ user.first_name }}, {{ user.last_name }}</li>
+                    <li><strong>Email:</strong> {{ user.email }}</li>
+                    <li><strong>عضویت:</strong> {{ user.joined_at|date:"Y-m-d" }}</li>
+                    <li><strong>Profile note:</strong> {{ profile_note|default:"بدون یادداشت" }}</li>
+                    <li><strong>تأیید حساب:</strong> {% if is_verified %}✅{% else %}⏳{% endif %}</li>
+                </ul>
+                <button class="btn btn-primary w-100 mt-3" data-bs-toggle="modal" data-bs-target="#editProfileModal">ویرایش پروفایل ✏️</button>
+            </div>
+        </div>
+
+        <!-- آمار فعالیت‌ها -->
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card shadow-sm p-3 h-100">
+                <h4>آمار فعالیت‌ها</h4>
+                <ul>
+                    <li>تعداد کل پست‌ها: {{ total_posts }}</li>
+                    {% if last_post %}
+                        <li>آخرین فعالیت: {{ last_post.created_at|date:"Y/m/d H:i" }}</li>
+                    {% else %}
+                        <li>هنوز پستی ارسال نکرده‌اید.</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- اعلان‌ها -->
+        <div class="col-lg-4 col-md-12 mb-3">
+            <div class="card shadow-sm p-3 h-100">
+                <h4>اعلان‌ها 🔔</h4>
+                <ul class="list-unstyled">
+                    {% for n in notifications %}
+                        <li class="{% if not n.read %}fw-bold{% endif %} mb-2">
                             <small>{{ n.created_at|timesince }} ago</small><br>
                             {{ n.title }} — {{ n.message|truncatechars:80 }}
                         </li>
-                        {% empty %}
+                    {% empty %}
                         <li>هیچ اعلانی ندارید.</li>
-                        {% endfor %}
-                    </ul>
-                    <a href="{% url 'notifications' %}">مشاهده همه اعلان ها</a>
-                </div>
-            </div>
-
-            </div>
-            <div class="col-md-8">
-                <div class="card shadow-sm">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5>پست‌های شما</h5>
-                        <a href="{% url 'blog:post_create' %}" class="btn btn-sm btn-success">➕ پست جدید</a>
-                    </div>
-                    <div class="card-body">
-                        {% if recent_posts %}
-                        <ul class="list-group list-group-flush">
-                            {% for post in recent_posts %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <div>
-                                    <a href="{% url 'blog:post_detail' post.slug %}"><strong>{{ post.title }}</strong></a><br>
-                                    <small class="text-muted">{{ post.created_at|date:"Y-m-d H:i" }}</small>
-                                </div>
-                                <a href="{% url 'blog:post_edit' post.slug %}" class="btn btn-outline-secondary btn-sm">ویرایش</a>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                        {% else %}
-                        <p class="text-muted text-center">شما هنوز هیچ پستی ننوشته‌اید.</p>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="card p-3">
-                <h5>فعالیت های اخیر</h5>
-                <ul class="list-group">
-                    {% for act in activities %}
-                    <li class="list-group-item d-flex justify-content-between align-items-start">
-                        <div>
-                        {% if act.type == "post" %}
-                            <a href="{{ act.url }}"><strong>{{ act.title }}</strong></a>
-                            <div class="text-muted small">Post • {{ act.created_at|date:"Y-m-d H:i" }}</div>
-                        {% else %}
-                            <strong>{{ act.title }}</strong>
-                            <div class="text-muted small">{{ act.message|truncatechars:120 }}</div>
-                            <div class="text-muted small">{{ act.created_at|date:"Y-m-d H:i" }}</div>
-                        {% endif %}
-                        </div>
-                    </li>
                     {% endfor %}
                 </ul>
+                <a href="{% url 'notifications' %}">مشاهده همه اعلان‌ها</a>
+            </div>
+        </div>
+
+    </div> <!-- row -->
+
+    <div class="row mt-3">
+
+        <!-- پست‌ها -->
+        <div class="col-lg-8 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>پست‌های شما</h5>
+                    <a href="{% url 'blog:post_create' %}" class="btn btn-sm btn-success">➕ پست جدید</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_posts %}
+                        <ul class="list-group list-group-flush">
+                            {% for post in recent_posts %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <a href="{% url 'blog:post_detail' post.slug %}"><strong>{{ post.title }}</strong></a><br>
+                                        <small class="text-muted">{{ post.created_at|date:"Y-m-d H:i" }}</small>
+                                    </div>
+                                    <a href="{% url 'blog:post_edit' post.slug %}" class="btn btn-outline-secondary btn-sm">ویرایش</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted text-center">شما هنوز هیچ پستی ننوشته‌اید.</p>
+                    {% endif %}
                 </div>
             </div>
+        </div>
 
+        <!-- فعالیت‌های اخیر -->
+        <div class="col-lg-4 mb-3">
+            <div class="card shadow-sm p-3 h-100">
+                <h5>فعالیت‌های اخیر</h5>
+                <ul class="list-group list-group-flush">
+                    {% for act in activities %}
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div>
+                                {% if act.type == "post" %}
+                                    <a href="{{ act.url }}"><strong>{{ act.title }}</strong></a>
+                                    <div class="text-muted small">Post • {{ act.created_at|date:"Y-m-d H:i" }}</div>
+                                {% else %}
+                                    <strong>{{ act.title }}</strong>
+                                    <div class="text-muted small">{{ act.message|truncatechars:120 }}</div>
+                                    <div class="text-muted small">{{ act.created_at|date:"Y-m-d H:i" }}</div>
+                                {% endif %}
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
             </div>
+        </div>
+
+    </div> <!-- row -->
+
+</div> <!-- container -->
+
+<!-- Modal فرم ویرایش پروفایل -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProfileLabel">ویرایش پروفایل ✏️</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    {{ form.as_p }}
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">ذخیره تغییرات</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
-
 {% endblock %}

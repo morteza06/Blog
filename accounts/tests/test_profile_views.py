@@ -25,7 +25,7 @@ def test_profile_edit_updates_user(client):
     client.login(username="a", password="123")
 
     response = client.post(
-        reverse("profile_edit"),
+        reverse("dashboard"),
         {"first_name": "Ali", "last_name": "Ahmadi", "email": "ali@example.com"},
     )
 

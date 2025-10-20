@@ -9,7 +9,7 @@ def test_email_unique_validation(client, django_user_model):
     User.objects.create_user(username="b", email="b@example.com", password="123")
     client.login(username="b", password="123")
 
-    url = reverse("profile_edit")
+    url = reverse("dashboard")
     resp = client.post(
         url,
         {"email": "a@example.com", "first_name": "X", "last_name": "Y"},
