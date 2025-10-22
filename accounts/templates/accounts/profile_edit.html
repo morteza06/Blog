@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow p-4">
+        <h3 class="mb-3">ویرایش پروفایل ✏️</h3>
+
+        {% if messages %}
+        <div class="mb-3">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}  alert-dismissible fade show" role="alert">{{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+             {{ form|crispy }}
+
+            <div class="d-flex justify-content-between mt-3">
+                <button type="submit" class="btn btn-primary">ذخیره تغییرات</button>
+                <button type="button" id="cancelBtn" class="btn btn-secondary">انصراف</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+  // وقتی دکمه انصراف کلیک شود
+  document.getElementById("cancelBtn").addEventListener("click", function () {
+    if (confirm("آیا مطمئن هستید که می‌خواهید انصراف دهید؟ تغییرات ذخیره نمی‌شود.")) {
+      // ایجاد و ارسال فرم برای دکمه cancel
+      const form = document.getElementById("profileForm");
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = "cancel";
+      form.appendChild(input);
+      form.submit();
+    }
+  });
+</script>
+
+{% endblock %}

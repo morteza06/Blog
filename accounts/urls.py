@@ -16,6 +16,7 @@ urlpatterns = [
     ),
     path("signup/", views.signup, name="signup"),
     path("dashboard/", views.dashboard, name="dashboard"),
+    path("profile/edit/", views.profile_edit, name="profile_edit"),
     path("profile/<str:username>/", views.profile_view, name="profile"),
     path("notifications/", views.notifications_list, name="notifications"),
     path(

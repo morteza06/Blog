@@ -24,12 +24,20 @@ colorama==0.4.6
     #   build
     #   click
     #   pytest
+crispy-bootstrap5==2025.6
+    # via -r requirements.in
 distlib==0.4.0
     # via virtualenv
 django==5.2.7
     # via
     #   -r requirements.in
+    #   crispy-bootstrap5
+    #   django-crispy-forms
     #   django-extensions
+django-crispy-forms==2.4
+    # via
+    #   -r requirements.in
+    #   crispy-bootstrap5
 django-extensions==4.1
     # via -r requirements.in
 filelock==3.19.1

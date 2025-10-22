@@ -21,20 +21,7 @@ def dashboard(request):
 
     user = request.user
     # استفاده از فرم با modal form
-    form = ProfileEditForm(request.POST or None, request.FILES or None, instance=user)
-
-    if request.method == "POST":
-        form = ProfileEditForm(request.POST, request.FILES, instance=user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "پروفایل با موفقیت ویرایش شد ✅")
-            return redirect("dashboard")  # مهم برای نمایش پیام
-        else:
-            # فرم خطا دارد، HTML فرم را دوباره برمی‌گردانیم
-            messages.error(request, "خطا خطایی در فرم وجود دارد. لطفاً بررسی کنید. ❌")
-    else:
-        form = ProfileEditForm(instance=user)
-
+    # form = ProfileEditForm(request.POST or None, request.FILES or None, instance=user)
     greeting = _get_greeting()
     postsqs = Post.objects.filter(author=user)
     total_posts = postsqs.count()
@@ -106,7 +93,6 @@ def dashboard(request):
         "notifications": notifications,
         "activities": activities,
         "post_stats": post_stats,  # ← این مقدار به قالب می‌رود
-        "form": form,
     }
     return render(request, "accounts/dashboard.html", context)
 
@@ -135,6 +121,27 @@ def signup(request):
 
 
 User = get_user_model()
+
+
+@login_required
+def profile_edit(request):
+    user = request.user
+    if request.method == "POST":
+        if "cancel" in request.POST:
+            messages.info(request, "تغییری اعمال نشد.")
+            return redirect("dashboard")  # ← بازگشت به داشبورد در حالت انصراف
+        form = ProfileEditForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "پروفایل با موفقیت ویرایش شد ✅")
+            return redirect("dashboard")  # مهم برای نمایش پیام
+        else:
+            # فرم خطا دارد، HTML فرم را دوباره برمی‌گردانیم
+            messages.error(request, "خطا خطایی در فرم وجود دارد. لطفاً بررسی کنید. ❌")
+    else:
+        form = ProfileEditForm(instance=user)
+
+    return render(request, "accounts/profile_edit.html", {"form": form})
 
 
 @login_required

@@ -176,3 +176,9 @@ class ProfileEditForm(forms.ModelForm):
             if bd < datetime.date(1900, 1, 1):
                 raise ValidationError("تاریخ تولد باید بعد از سال 1900 باشد.")
         return bd
+
+    def clean_avatar(self):
+        avatar = self.cleaned_data.get("avatar")
+        if avatar and avatar.size > 2 * 1024 * 1024:
+            raise forms.ValidationError("حجم تصویر نباید بیش از ۲ مگابایت باشد.")
+        return avatar

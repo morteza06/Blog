@@ -10,3 +10,5 @@ mypy
 bandit
 Pillow
 django_extensions
+django-crispy-forms
+crispy-bootstrap5
