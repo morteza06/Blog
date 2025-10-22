@@ -1,8 +1,29 @@
 {% extends 'base.html' %}
+<style>
+    /* استایل پیام‌های خطا */
+    .text-danger {
+        color: #dc3545 !important;
+    }
+
+    /* برای فیلدهای نامعتبر */
+    input.is-invalid, select.is-invalid, textarea.is-invalid {
+        border-color: #dc3545 !important;
+        background-color: #ffeaea !important;
+    }
+
+    /* فاصله پیام خطا از فیلد */
+    .invalid-feedback {
+        display: block;
+        font-size: 0.9rem;
+        color: #dc3545;
+        margin-top: 2px;
+    }
+</style>
+
 {% load static %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container mt-4 ">
     <!-- نمایش پیام ها  -->
     {% if messages %}
     <div class="mb-3">
@@ -18,7 +39,7 @@
     <!-- خوش آمدگویی -->
     <div class="row mb-3">
         <div class="col-12">
-            <h2>{{ greeting }}، {{ user.username }} 👋</h2>
+            <h2 >{{ greeting }}، {{ user.username }} 👋</h2>
             <p>خوش آمدی به داشبورد شخصی‌ات.</p>
         </div>
     </div>
@@ -28,27 +49,29 @@
         <!-- پروفایل کاربر -->
         <div class="col-lg-4 col-md-6">
             <div class="card shadow-sm p-3 h-100 border-primary">
-                <div class="text-center mb-3 text-primary">
+                <div class="text-center mb-3 text-primary" >
                     <i class="bi bi-person-circle" style="font-size:2rem;"></i>
                 </div>
                 <div class="text-center mb-3">
                     {% if avatar %}
-                        <img src="{{ user.avatar.url }}" alt="{{ display_name }}" class="rounded-circle" width="120" height="120">
+                    <img src="{{ user.avatar.url }}" alt="{{ display_name }}" class="rounded-circle" width="120" height="120">
                     {% else %}
-                        <img src="{% static 'images/default-avatar.png' %}" class="rounded-circle" width="120" height="120">
+                    <img src="{% static 'images/default-avatar.png' %}" class="rounded-circle" width="120" height="120">
                     {% endif %}
                 </div>
                 <h5 class="text-center">{{ user.display_name|default:user.username }}</h5>
                 <ul class="list-unstyled mt-2">
-                    <li><strong>Full name:</strong> {{ user.first_name }}, {{ user.last_name }}</li>
-                    <li><strong>Email:</strong> {{ user.email }}</li>
+                    <li><strong>نام و نام خانوادگی:</strong> {{ user.first_name }}, {{ user.last_name }}</li>
+                    <li><strong>ایملیل:</strong> {{ user.email }}</li>
                     <li><strong>عضویت:</strong> {{ user.joined_at|date:"Y-m-d" }}</li>
-                    <li><strong>Profile note:</strong> {{ profile_note|default:"بدون یادداشت" }}</li>
+                    <li><strong>یادداشت کاربر:</strong> {{ profile_note|default:"بدون یادداشت" }}</li>
                     <li><strong>تأیید حساب:</strong> {% if is_verified %}✅{% else %}⏳{% endif %}</li>
                 </ul>
-                <button class="btn btn-primary w-100 mt-3" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+
+                <button type="button" class="btn btn-primary w-100 mt-3" data-bs-toggle="modal" data-bs-target="#editProfileModal">
                     <i class="bi bi-pencil-square"></i> ویرایش پروفایل
                 </button>
+
             </div>
         </div>
 
@@ -62,7 +85,7 @@
                 <ul>
                     <li>تعداد کل پست‌ها: {{ total_posts }}</li>
                     {% if last_post %}
-                        <li>آخرین فعالیت: {{ last_post.created_at|date:"Y/m/d H:i" }}</li>
+                    <li>آخرین فعالیت: {{ last_post.created_at|date:"Y/m/d H:i" }}</li>
                     {% else %}
                         <li>هنوز پستی ارسال نکرده‌اید.</li>
                     {% endif %}
@@ -80,19 +103,19 @@
                 </div>
                 <ul class="list-unstyled">
                     {% for n in notifications %}
-                        <li class="d-flex justify-content-between align-items-start mb-2 {% if not n.read %}fw-bold{% endif %}">
+                    <li class="d-flex justify-content-between align-items-start mb-2 {% if not n.read %}fw-bold{% endif %}">
                             <div>
                                 {{ n.title }} — {{ n.message|truncatechars:80 }}<br>
-                                <small class="text-muted">{{ n.created_at|timesince }} ago</small>
+                                <small class="text-muted">{{ n.created_at|timesince }} قبلی</small>
                             </div>
                             {% if not n.read %}
                                 <span class="badge bg-danger rounded-pill">جدید</span>
-                            {% endif %}
-                        </li>
-                    {% empty %}
-                        <li>هیچ اعلانی ندارید.</li>
-                    {% endfor %}
-                </ul>
+                                {% endif %}
+                            </li>
+                            {% empty %}
+                            <li>هیچ اعلانی ندارید.</li>
+                            {% endfor %}
+                        </ul>
                 <a href="{% url 'notifications' %}" class="text-decoration-none">مشاهده همه اعلان‌ها</a>
             </div>
         </div>
@@ -104,81 +127,139 @@
 
           <!-- پست‌ها -->
         <div class="col-lg-8">
-            <div class="card shadow-sm h-100 border-secondary">
+            <div class="card shadow-sm h-100 border-secondary list-gruoup list-group-flush " style="max-height: 400px; overflow-y: auto">
                 <div class="card-header d-flex justify-content-between align-items-center bg-secondary text-white">
                     <h5><i class="bi bi-pencil-square me-2"></i>پست‌های شما</h5>
                     <a href="{% url 'blog:post_create' %}" class="btn btn-sm btn-success">➕ پست جدید</a>
                 </div>
                 <div class="card-body">
                     {% if recent_posts %}
-                        <ul class="list-group list-group-flush">
-                            {% for post in recent_posts %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <a href="{% url 'blog:post_detail' post.slug %}"><strong>{{ post.title }}</strong></a><br>
+                    <ul class="list-group list-group-flush">
+                        {% for post in recent_posts %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <a href="{% url 'blog:post_detail' post.slug %}"><strong>{{ post.title }}</strong></a><br>
                                         <small class="text-muted">{{ post.created_at|date:"Y-m-d H:i" }}</small>
                                     </div>
                                     <a href="{% url 'blog:post_edit' post.slug %}" class="btn btn-outline-secondary btn-sm">
                                         <i class="bi bi-pencil-square"></i> ویرایش
                                     </a>
                                 </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p class="text-muted text-center">شما هنوز هیچ پستی ننوشته‌اید.</p>
-                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                            {% else %}
+                            <p class="text-muted text-center">شما هنوز هیچ پستی ننوشته‌اید.</p>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-           <!-- فعالیت‌های اخیر -->
-        <div class="col-lg-4">
-            <div class="card shadow-sm p-3 h-100 border-info">
+                <!-- فعالیت‌های اخیر -->
+                <div class="col-lg-4 list-gruoup list-group-flush " style="max-height: 400px; overflow-y: auto">
+                    <div class="card shadow-sm p-3 h-100 border-info">
                 <div class="d-flex align-items-center mb-2 text-info">
                     <i class="bi bi-clock-history me-2" style="font-size:1.5rem;"></i>
                     <h5 class="m-0">فعالیت‌های اخیر</h5>
                 </div>
-                <ul class="list-group list-group-flush">
+                <ul class="list-group list-group-flush" style="max-height: 400px; overflow-y: auto">
                     {% for act in activities %}
-                        <li class="list-group-item d-flex justify-content-between align-items-start">
-                            <div>
-                                {% if act.type == "post" %}
-                                    <a href="{{ act.url }}"><strong>{{ act.title }}</strong></a>
-                                    <div class="text-muted small">Post • {{ act.created_at|date:"Y-m-d H:i" }}</div>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div>
+                            {% if act.type == "post" %}
+                            <a href="{{ act.url }}"><strong>{{ act.title }}</strong></a>
+                            <div class="text-muted small">Post • {{ act.created_at|date:"Y-m-d H:i" }}</div>
                                 {% else %}
-                                    <strong>{{ act.title }}</strong>
-                                    <div class="text-muted small">{{ act.message|truncatechars:120 }}</div>
+                                <strong>{{ act.title }}</strong>
+                                <div class="text-muted small">{{ act.message|truncatechars:120 }}</div>
                                     <div class="text-muted small">{{ act.created_at|date:"Y-m-d H:i" }}</div>
-                                {% endif %}
-                            </div>
-                        </li>
+                                    {% endif %}
+                                </div>
+                            </li>
                     {% endfor %}
                 </ul>
             </div>
         </div>
 
-    </div> <!-- row -->
+        <!-- نمودار فعالیت های ماهانه -->
+         <div class="card shadow-sm mt-3 p-3 border-info">
+             <h5><i class="bi bi-bar-chart-line me-2"></i>نمودار فعالیت ماهانه</h5>
+             <canvas id="activityChart" width="400" height="200"></canvas>
+            </div>
 
-</div> <!-- container -->
 
-<!-- Modal فرم ویرایش پروفایل -->
-<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editProfileLabel"><i class="bi bi-pencil-square me-2"></i>ویرایش پروفایل</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    {{ form.as_p }}
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">ذخیره تغییرات</button>
-                </div>
-            </form>
+        </div> <!-- row -->
+
+    </div> <!-- container -->
+
+    <!-- Modal فرم ویرایش پروفایل -->
+    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post" enctype="multipart/form-data" action="">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editProfileLabel">
+                            <i class="bi bi-pencil-square me-2">&nbsp;&nbsp;ویرایش پروفایل&nbsp;&nbsp;✏️&nbsp;&nbsp;</i>
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                       {{ form.as_p}}
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">&nbsp;&nbsp;بستن&nbsp;&nbsp;</button>
+                    <button type="submit" class="btn btn-success">&nbsp;&nbsp;ذخیره تغییرات&nbsp;&nbsp;</button>
+                    </div>
+                </form>
+
+            </div>
         </div>
     </div>
-</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- طراحی نمودار -->
+<script>
+    const postStats = JSON.parse('{{ post_stats|escapejs }}');
+    const ctx = document.getElementById('activityChart').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: postStats.map(item => item.month),
+            datasets: [{
+                label: 'تعداد پست‌ها در ماه',
+                data: postStats.map(item => item.count),
+                borderWidth: 1,
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
+
+<!-- مانع بسته شدن فرم مدال -->
+<script>
+    document.getElementById('editProfileForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+
+    const response = await fetch(form.action, {
+        method: 'POST',
+        body: formData
+    });
+
+    const html = await response.text();
+    document.getElementById('editProfileModalBody').innerHTML = html;
+
+    // اگر خطا بود، فرم در همان مدال باقی می‌ماند
+    });
+</script>
+
 {% endblock %}

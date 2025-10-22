@@ -1,49 +1,95 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
-<article>
-    <h2>{{ post.title }}</h2>
-    <div>
-        {{ post.content|safe }}
-    </div>
-    <div>
-        <p class="text-muted">By
-            <a href="{% url 'profile' post.author.username %}">
-                {{ post.author.display_name|default:post.author.username }}</a>
-             • {{ post.created_at|date:"Y-m-d H:i" }}</p>
 
-             {% if post.tags.all %}
-             <p>Tags:
+<article class="container my-4">
 
-                {% for t in post.tags.all %}
-                    <a href="{% url 'blog:tagged' t.slug %}">#{{ t.name }}</a>
-                    {% if not forloop.last %}
-                        ,
-                    {% endif %}
-                {% endfor %}
-             </p>
-             {% endif %}
-    </div>
-    <hr>
-    <p>Updated: {{ post.updated_at|date:"Y-m-d H:i"}}</p>
-    <p>Published: {{ post.published_at|date:"Y-m-d H:i" }}</p>
-    <hr>
-    <h3>نظرات کاربران</h3>
-    {% for comment in comments %}
-        <div class="border rounded p-2 mb-2">
-            <p>{{ comment.content }}</p>
+    <!-- عنوان پست -->
+    <h1 class="mb-3">{{ post.title }}</h1>
+
+    <!-- اطلاعات نویسنده و تاریخ -->
+    <div class="d-flex align-items-center mb-3 text-muted">
+        {% if post.author.avatar %}
+            <img src="{{ post.author.avatar.url }}" alt="{{ post.author.display_name|default:post.author.username }}"
+                 class="rounded-circle me-2" width="40" height="40">
+        {% else %}
+            <img src="{% static 'images/default-avatar.png' %}" alt="avatar"
+                 class="rounded-circle me-2" width="40" height="40">
+        {% endif %}
+        <div>
             <small>
-            {% if comment.author %}
-                نویسنده: {{ comment.author.display_name|default:comment.author.username }}
-                تاریخ ایجاد:  {{ comment.created_at|date:"Y/m/d H:i" }}
-            {% else %}
-                نویسنده ناشناس
-            {% endif %}
+                توسط <a href="{% url 'profile' post.author.username %}">
+                    {{ post.author.display_name|default:post.author.username }}</a> •
+                منتشر شده: {{ post.created_at|date:"Y-m-d H:i" }} •
+                آخرین بروزرسانی: {{ post.updated_at|date:"Y-m-d H:i" }}
             </small>
         </div>
-        {% empty %}
-        <p>هنوز نظری برای این پست ثبت نشده است.</p>
-    {% endfor %}
-    <a href="{% url 'blog:home' %}">بازگشت به لیست پست‌ها</a>
+    </div>
+
+    <!-- محتوای پست -->
+    <div class="mb-4" style="line-height: 1.8; font-size: 1.05rem;">
+        {{ post.content|safe }}
+    </div>
+
+    <!-- تگ‌ها -->
+    {% if post.tags.all %}
+        <div class="mb-4">
+            <strong>تگ‌ها:</strong>
+            {% for t in post.tags.all %}
+                <a href="{% url 'blog:tagged' t.slug %}" class="badge bg-primary text-decoration-none me-1">#{{ t.name }}</a>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <hr>
+
+    <!-- بخش نظرات -->
+    <section class="comments mt-4">
+        <h3 class="mb-3">نظرات کاربران</h3>
+
+        {% if comments %}
+            {% for comment in comments %}
+                <div class="border rounded p-3 mb-3 bg-light">
+                    <div class="d-flex align-items-center mb-2">
+                        {% if comment.author and comment.author.avatar %}
+                            <img src="{{ comment.author.avatar.url }}" alt="{{ comment.author.display_name|default:comment.author.username }}"
+                                 class="rounded-circle me-2" width="30" height="30">
+                        {% else %}
+                            <img src="{% static 'images/default-avatar.png' %}" class="rounded-circle me-2" width="30" height="30">
+                        {% endif %}
+                        <strong class="me-2">
+                            {% if comment.author %}
+                                {{ comment.author.display_name|default:comment.author.username }}
+                            {% else %}
+                                ناشناس
+                            {% endif %}
+                        </strong>
+                        <small class="text-muted">{{ comment.created_at|date:"Y/m/d H:i" }}</small>
+                    </div>
+                    <p class="mb-0">{{ comment.content }}</p>
+
+                    <!-- پاسخ مدیر (در صورت وجود) -->
+                    {% if comment.reply %}
+                        <div class="border-start border-3 border-primary ps-3 mt-2">
+                            <small class="text-primary">
+                                پاسخ مدیر {{ comment.reply.admin.display_name|default:comment.reply.admin.username }}
+                                در {{ comment.reply.created_at|date:"Y/m/d H:i" }}
+                            </small>
+                            <p class="mb-0">{{ comment.reply.message }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted">هنوز نظری برای این پست ثبت نشده است.</p>
+        {% endif %}
+    </section>
+
+    <!-- دکمه بازگشت -->
+    <div class="mt-4">
+        <a href="{% url 'blog:home' %}" class="btn btn-outline-secondary">بازگشت به لیست پست‌ها</a>
+    </div>
 
 </article>
+
 {% endblock %}

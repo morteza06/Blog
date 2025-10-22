@@ -1,0 +1,8 @@
+<div class="custom-file">
+    <input type="file" name="{{ widget.name }}" class="form-control-file" id="{{ widget.attrs.id }}">
+</div>
+{% if widget.value %}
+    <div class="mt-2">
+        <img src="{{ widget.value.url }}" alt="عکس پروفایل فعلی" width="120" height="120" class="rounded shadow">
+    </div>
+{% endif %}

@@ -4,8 +4,8 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
-
-from .models import CustomUser
+from django.forms import ClearableFileInput
+from PIL import Image
 
 User = get_user_model()
 
@@ -30,9 +30,115 @@ class ProfileForm(forms.ModelForm):
         }
 
 
+def validate_image(image):
+    max_size = 2 * 1024 * 1024  # ۲ مگابایت
+    valid_extensions = ["jpg", "jpeg", "png"]
+
+    # بررسی نوع فایل
+    ext = image.name.split(".")[-1].lower()
+    if ext not in valid_extensions:
+        raise ValidationError("فرمت فایل باید JPG یا PNG باشد.")
+
+    # بررسی حجم فایل
+    if image.size > max_size:
+        raise ValidationError("حجم تصویر نباید بیش از ۲ مگابایت باشد.")
+
+    # بررسی ابعاد تصویر
+    img = Image.open(image)
+    width, height = img.size
+    if width > 2000 or height > 2000:
+        raise ValidationError(
+            "ابعاد تصویر بیش از حد بزرگ است (حداکثر 2000x2000 پیکسل)."
+        )
+
+
+class CustomClearableFileInput(ClearableFileInput):
+    template_name = "widgets/custom_clearable_file_input.html"
+
+
 class ProfileEditForm(forms.ModelForm):
+    first_name = forms.CharField(
+        label="نام",
+        required=True,
+        error_messages={"required": "لطفاً نام خود را وارد کنید."},
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "نام خود را وارد کنید"}
+        ),
+    )
+
+    last_name = forms.CharField(
+        label="نام خانوادگی",
+        required=True,
+        error_messages={"required": "لطفاً نام خانوادگی خود را وارد کنید."},
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "نام خانوادگی خود را وارد کنید",
+            }
+        ),
+    )
+
+    display_name = forms.CharField(
+        label="نام نمایشی",
+        required=True,
+        error_messages={"required": "نام نمایشی الزامی است."},
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "نامی که در پروفایل نمایش داده می‌شود",
+            }
+        ),
+    )
+
+    email = forms.EmailField(
+        label="ایمیل",
+        required=True,
+        error_messages={
+            "required": "لطفاً ایمیل خود را وارد کنید.",
+            "invalid": "ایمیل معتبر نیست.",
+        },
+        widget=forms.EmailInput(
+            attrs={"class": "form-control", "placeholder": "ایمیل خود را وارد کنید"}
+        ),
+    )
+
+    avatar = forms.ImageField(
+        label="عکس پروفایل",
+        required=False,
+        validators=[validate_image],
+        widget=CustomClearableFileInput(
+            attrs={
+                "class": "form-control-file",
+                "placeholder": "تصویر خود را انتخاب کنید",
+            }
+        ),
+    )
+
+    birth_date = forms.DateField(
+        label="تاریخ تولد",
+        required=False,
+        widget=forms.DateInput(
+            attrs={
+                "class": "form-control",
+                "type": "date",
+            }
+        ),
+    )
+
+    profile_note = forms.CharField(
+        label="پیام پروفایل",
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "rows": 3,
+                "placeholder": "چیزی درباره خودت بنویسید...",
+            }
+        ),
+    )
+
     class Meta:
-        model = CustomUser
+        model = User
         fields = [
             "first_name",
             "last_name",
@@ -42,30 +148,11 @@ class ProfileEditForm(forms.ModelForm):
             "email",
             "profile_note",
         ]
-        widgets = {
-            "first_name": forms.TextInput(attrs={"class": "from-control"}),
-            "last_name": forms.TextInput(attrs={"class": "form-control"}),
-            "display_name": forms.TextInput(attrs={"class": "form-control"}),
-            "avatar": forms.ClearableFileInput(attrs={"class": "form-control"}),
-            "birth_data": forms.DateInput(
-                attrs={
-                    "class": "form-control",
-                    "type": "date",
-                    "min": "1900-01-01",
-                    "max": datetime.date.today().isoformat(),  # تاریخ امروز
-                }
-            ),
-            "email": forms.EmailInput(
-                attrs={"class": "form-control", "placeholder": "Email address"}
-            ),
-            "profile_note": forms.Textarea(
-                attrs={
-                    "class": "from-control",
-                    "rows": 4,
-                    "placeholder": "Personal note or message",
-                }
-            ),
-        }
+
+    # تغییر برچسب‌ها
+    first_name = forms.CharField(
+        label="نام", error_messages={"required": "لطفاً نام خود را وارد کنید."}
+    )
 
     def clean_email(self):
         email = self.cleaned_data.get("email")

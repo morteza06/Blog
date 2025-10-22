@@ -1,13 +1,47 @@
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.db import models
+from PIL import Image
+
+
+def validate_avatar(image):
+    """
+    هدف : اعتبارسنجی داده در سطح پایگاه داده و هر ورودی مستقیم به مدل.
+        پیام خطا برای کاربر:معمولاً پیام خام یا ValidationError
+    """
+    max_size = 2 * 1024 * 1024  # 2MB
+    valid_extensions = ["jpg", "jpeg", "png"]
+
+    # نوع فایل
+    ext = image.name.split(".")[-1].lower()
+    if ext not in valid_extensions:
+        raise ValidationError("فرمت فایل باید jpg یا png باشد.")
+
+    # حجم فایل
+    if image.size > max_size:
+        raise ValidationError("حجم تصویر نباید بیش از ۲ مگابایت باشد.")
+
+    # ابعاد تصویر
+    img = Image.open(image)
+    width, height = img.size
+    if width > 2000 or height > 2000:
+        raise ValidationError(
+            "ابعاد تصویر بیش از حد بزرگ است (حداکثر 2000x2000 پیکسل)."
+        )
 
 
 class CustomUser(AbstractUser):
     """OR Profile Model----گسترش User با اطلاعات اضافی"""
 
     display_name = models.CharField(max_length=100, blank=True)
-    avatar = models.ImageField(upload_to="images/avatars/", blank=True, null=True)
+    avatar = models.ImageField(
+        upload_to="images/avatars/",
+        validators=[validate_avatar],
+        blank=True,
+        null=True,
+        help_text="تصویر پروفایل شما (حداکثر 2MB و ابعاد 2000x2000)",
+    )
     birth_date = models.DateField(blank=True, null=True)
     profile_note = models.TextField(blank=True, help_text="پیام یا توضیح وضعیت")
     is_verified = models.BooleanField(default=False)
