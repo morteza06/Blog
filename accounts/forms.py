@@ -7,6 +7,8 @@ from django.core.exceptions import ValidationError
 from django.forms import ClearableFileInput
 from PIL import Image
 
+from .models import Notification
+
 User = get_user_model()
 
 
@@ -182,3 +184,25 @@ class ProfileEditForm(forms.ModelForm):
         if avatar and avatar.size > 2 * 1024 * 1024:
             raise forms.ValidationError("حجم تصویر نباید بیش از ۲ مگابایت باشد.")
         return avatar
+
+
+class NotificationForm(forms.ModelForm):
+    class Meta:
+        model = Notification
+        fields = ["user", "title", "message", "notif_type"]
+        widgets = {
+            "user": forms.Select(attrs={"class": "form-select"}),
+            "title": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "عنوان اعلان"}
+            ),
+            "message": forms.Textarea(
+                attrs={"class": "form-control", "placeholder": "پیام اعلان", "rows": 3}
+            ),
+            "notif_type": forms.Select(attrs={"class": "form-select"}),
+        }
+        labels = {
+            "user": "گیرنده",
+            "title": "عنوان",
+            "message": "پیام",
+            "notif_type": "نوع اعلان",
+        }

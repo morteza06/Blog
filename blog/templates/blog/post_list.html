@@ -1,37 +1,83 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
-<h2>پست‌ها</h2>
-
-{% if user.is_authenticated %}
-  سلام، {{ user.username }} — <a href="{% url 'logout' %}">خروج</a>
-{% else %}
-  <a href="{% url 'login' %}">ورود</a> | <a href="{% url 'signup' %}">ثبت‌نام</a>
-{% endif %}
-
-{% for post in page_obj %}
-  <div class="card mb-3">
-    <div class="card-body">
-      <h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
-      <p>{{ post.content|truncatewords:30 }}</p>
-      <p>
-        تگ‌ها:
-        {% for tag in post.tags.all %}
-          <a href="{% url 'blog:tagged' tag.slug %}">{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}
-        {% endfor %}
-      </p>
+<div class="container my-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="fw-bold text-primary">آخرین پست‌ها</h2>
+    <div>
+      {% if user.is_authenticated %}
+        <span class="me-2 text-muted">سلام، {{ user.username }}</span>
+        <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">خروج</a>
+      {% else %}
+        <a href="{% url 'login' %}" class="btn btn-outline-primary btn-sm">ورود</a>
+        <a href="{% url 'signup' %}" class="btn btn-primary btn-sm ms-2">ثبت‌نام</a>
+      {% endif %}
     </div>
   </div>
-{% empty %}
-  <p>هیچ پستی ارسال نشده.</p>
-{% endfor %}
 
-<div class="pagination">
-  {% if page_obj.has_previous %}
-  <a href="?page={{ page_obj.previous_page_number }}">قبلی</a>
+  {% if page_obj %}
+    {% for post in page_obj %}
+      <div class="card shadow-sm mb-4 border-0">
+        <div class="row g-0">
+          {% if post.image %}
+            <div class="col-md-3">
+              <img src="{{ post.image.url }}" class="img-fluid rounded-start" alt="{{ post.title }}">
+            </div>
+          {% endif %}
+          <div class="col">
+            <div class="card-body">
+              <h4 class="card-title mb-2">
+                <a href="{{ post.get_absolute_url }}" class="text-decoration-none text-dark">
+                  {{ post.title }}
+                </a>
+              </h4>
+              <p class="card-text text-muted small mb-2">
+                <i class="bi bi-person"></i> {{ post.author.display_name|default:post.author.username }}
+                • <i class="bi bi-clock"></i> {{ post.published_at|date:"Y/m/d H:i" }}
+              </p>
+              <p class="card-text">{{ post.content|truncatewords:25 }}</p>
+
+              {% if post.tags.exists %}
+                <div class="mt-2">
+                  {% for tag in post.tags.all %}
+                    <a href="{% url 'blog:tagged' tag.slug %}" class="badge bg-secondary text-light text-decoration-none me-1">
+                      #{{ tag.name }}
+                    </a>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="alert alert-warning">هیچ پستی برای نمایش وجود ندارد.</div>
   {% endif %}
-  <span>صفحه {{ page_obj.number }} از {{ page_obj.paginator.num_pages }}</span>
-  {% if page_obj.has_next %}
-  <a href="?page={{ page_obj.next_page_number }}">بعدی</a>
-  {% endif %}
+
+  <!-- Pagination -->
+  <nav aria-label="Page navigation" class="d-flex justify-content-center">
+    <ul class="pagination">
+      {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.previous_page_number }}">قبلی</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">قبلی</span></li>
+      {% endif %}
+
+      <li class="page-item active">
+        <span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+      </li>
+
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.next_page_number }}">بعدی</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">بعدی</span></li>
+      {% endif %}
+    </ul>
+  </nav>
 </div>
 {% endblock %}

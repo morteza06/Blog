@@ -20,5 +20,12 @@ class CommentForm(forms.ModelForm):
         model = Comment
         fields = ["content"]
         widgets = {
-            "content": forms.Textarea(attrs={"class": "form-control", "rows": 3})
+            "content": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "نظر خود را اینجا بنویسید...",
+                    "rows": 3,
+                }
+            )
         }
+        labels = {"content": "ویرایش نظر"}

@@ -1,15 +1,25 @@
 {% extends 'base.html' %}
-
 {% block content %}
-<h2>{{title}}</h2>
-
-<form method="post">
+<div class="container mt-4">
+  <h3>{% if mode == 'create' %}ایجاد پست جدید{% else %}ویرایش پست{% endif %}</h3>
+  <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary mt-2">Save</button>
-
-</form>
-<div style="margin-top:20px;">
-    <a href="{% url 'dashboard' %}" style="color:#2563eb;">Cancel</a>
+    {{ form.non_field_errors }}
+    {% for field in form %}
+      <div class="mb-3">
+        <label class="form-label">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}
+          <div class="text-danger small">
+            {% for e in field.errors %}{{ e }}{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-primary">ذخیره</button>
+      <a href="{% url 'blog:home' %}" class="btn btn-secondary">لغو</a>
+    </div>
+  </form>
 </div>
-{% endblock content %}
+{% endblock %}

@@ -85,10 +85,12 @@ class Post(models.Model):
 
 class Notification(models.Model):
     NOTIF_TYPE_CHOICES = [
-        ("info", "Info"),
-        ("system", "System"),
-        ("comment", "Comment"),
-        ("post", "Post"),
+        ("info", "اطلاعات"),
+        ("success", "موفقیت"),
+        ("warning", "هشدار"),
+        ("error", "خطا"),
+        ("comment", "کامنت"),
+        ("post", "پست"),
     ]
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications"
@@ -99,7 +101,7 @@ class Notification(models.Model):
         choices=NOTIF_TYPE_CHOICES, max_length=20, default="info"
     )
     created_at = models.DateTimeField(auto_now_add=True)
-    read = models.BooleanField(default=False)
+    is_read = models.BooleanField(default=False)
 
     class Meta:
         ordering = ["-created_at"]

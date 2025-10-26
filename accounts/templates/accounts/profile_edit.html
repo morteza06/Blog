@@ -29,18 +29,12 @@
 </div>
 
 <script>
-  // وقتی دکمه انصراف کلیک شود
-  document.getElementById("cancelBtn").addEventListener("click", function () {
+    document.getElementById("cancelBtn").addEventListener("click", function () {
     if (confirm("آیا مطمئن هستید که می‌خواهید انصراف دهید؟ تغییرات ذخیره نمی‌شود.")) {
-      // ایجاد و ارسال فرم برای دکمه cancel
-      const form = document.getElementById("profileForm");
-      const input = document.createElement("input");
-      input.type = "hidden";
-      input.name = "cancel";
-      form.appendChild(input);
-      form.submit();
+        window.location.href = "{% url 'dashboard' %}";
     }
-  });
+    });
 </script>
+
 
 {% endblock %}

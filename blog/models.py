@@ -34,6 +34,7 @@ class Post(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     published_at = models.DateTimeField(blank=True, null=True)
+    is_published = models.BooleanField(default=False)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="draft")
     tags = models.ManyToManyField(Tag, related_name="posts", blank=True)
 
@@ -41,6 +42,9 @@ class Post(models.Model):
         ordering = ["-created_at"]
 
     def save(self, *args, **kwargs):
+        # اگر is_published تنظیم شده ولی published_at خالی است، اکنون را ست کن
+        if self.is_published and not self.published_at:
+            self.published_at = timezone.now()
         if not self.slug:
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
@@ -48,7 +52,7 @@ class Post(models.Model):
     def publish(self):
         """تغییر وضعیت پست به منتشر شده"""
         self.status = "published"
-        self.publish_at = timezone.now()
+        self.published_at = timezone.now()
         self.save()
 
     def __str__(self):

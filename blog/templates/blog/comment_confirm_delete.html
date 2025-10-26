@@ -1,0 +1,6 @@
+<h3>آیا مطمئن هستید که می‌خواهید این نظر را حذف کنید؟</h3>
+<form method="post">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-danger">بله، حذف کن</button>
+  <a href="{% url 'blog:post_detail'  comment.post.slug %}" class="btn btn-secondary">انصراف</a>
+</form>

@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Delete Post</h2>
-<p>Are you sure you want to delete "{{ post.title }} ?</p>
+<h2>حذف پست </h2>
+<p>مطمئن هستید که می‌خواهید حذف کنید  "{{ post.title }} ?</p>
 <form  method="post">
     {% csrf_token %}
-    <button type="submit" class="btn btn_danger"> Yes, delete </button>
-    <a href="{{ post.get_absolute_url}}" class="btn btn-secondary">Cancel</a>
+    <button type="submit" class="btn btn_danger">بله و حذف شود </button>
+    <a href="{{ post.get_absolute_url}}" class="btn btn-secondary">انصراف</a>
 </form>
 
 {% endblock content %}

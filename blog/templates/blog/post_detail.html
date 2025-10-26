@@ -67,6 +67,10 @@
                         <small class="text-muted">{{ comment.created_at|date:"Y/m/d H:i" }}</small>
                     </div>
                     <p class="mb-0">{{ comment.content }}</p>
+                    {% if user == comment.author or user.is_staff %}
+                        <a href="{% url 'blog:comment_edit' comment.pk %}" class="btn btn-sm btn-outline-secondary">ویرایش</a>
+                        <a href="{% url 'blog:comment_delete' comment.pk %}" class="btn btn-sm btn-outline-danger">حذف</a>
+                    {% endif %}
 
                     <!-- پاسخ مدیر (در صورت وجود) -->
                     {% if comment.reply %}
@@ -82,6 +86,16 @@
             {% endfor %}
         {% else %}
             <p class="text-muted">هنوز نظری برای این پست ثبت نشده است.</p>
+        {% endif %}
+        {% if user.is_authenticated %}
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                {{ form.non_field_errors }}
+                <button name="comment_submit" type="submit" class="btn btn-primary">ثبت نظر</button>
+            </form>
+        {% else %}
+            <p>برای ثبت نظر ابتدا <a href="{% url 'login' %}">وارد شوید</a>.</p>
         {% endif %}
     </section>
 

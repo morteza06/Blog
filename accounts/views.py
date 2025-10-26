@@ -2,7 +2,7 @@ import json
 
 from django.contrib import messages
 from django.contrib.auth import get_user_model, login
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Count
 from django.db.models.functions import TruncMonth
 from django.shortcuts import get_object_or_404, redirect, render
@@ -10,7 +10,8 @@ from django.utils import timezone
 
 from blog.models import Comment, Post
 
-from .forms import ProfileEditForm, SignUpForm
+from .forms import NotificationForm, ProfileEditForm, SignUpForm
+from .models import Notification
 
 
 @login_required
@@ -48,8 +49,11 @@ def dashboard(request):
 
     # نوتیفیکیشن‌های کاربر (خوانده نشده قبل از همه)
     notifications = (
-        user.notifications.all()[:8] if hasattr(user, "notifications") else []
+        getattr(user, "notifications", Notification.objects.none())
+        .filter(pk__isnull=False)
+        .order_by("-created_at")[:8]
     )
+
     # تعداد قابل تنظیم
     # فعالیت‌های اخیر ترکیبی: هم پست و هم نوتیفیکیشن (می‌توان merge کرد)
     # برای ساده‌سازی، یک لیست مرتب بر اساس created_at می‌سازیم:
@@ -73,11 +77,11 @@ def dashboard(request):
             }
         )
 
-    # اعلان‌ها — بعداً از مدل Notification خوانده می‌شود
-    notifications = [
-        {"message": "پیام جدید از مدیر", "time": "۱ دقیقه پیش"},
-        {"message": "پست شما تأیید شد", "time": "۱۰ دقیقه پیش"},
-    ]
+    # # اعلان‌ها — بعداً از مدل Notification خوانده می‌شود
+    # notifications = [
+    #     {"message": "پیام جدید از مدیر", "time": "۱ دقیقه پیش"},
+    #     {"message": "پست شما تأیید شد", "time": "۱۰ دقیقه پیش"},
+    # ]
 
     context = {
         "greeting": greeting,
@@ -127,18 +131,18 @@ User = get_user_model()
 def profile_edit(request):
     user = request.user
     if request.method == "POST":
+        # اگر دکمه انصراف زده شود
         if "cancel" in request.POST:
             messages.info(request, "تغییری اعمال نشد.")
             return redirect("dashboard")  # ← بازگشت به داشبورد در حالت انصراف
+
         form = ProfileEditForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             form.save()
             messages.success(request, "پروفایل با موفقیت ویرایش شد ✅")
             return redirect("dashboard")  # مهم برای نمایش پیام
-        else:
-            # فرم خطا دارد، HTML فرم را دوباره برمی‌گردانیم
-            messages.error(request, "خطا خطایی در فرم وجود دارد. لطفاً بررسی کنید. ❌")
     else:
+        # فرم خطا دارد، HTML فرم را دوباره برمی‌گردانیم
         form = ProfileEditForm(instance=user)
 
     return render(request, "accounts/profile_edit.html", {"form": form})
@@ -161,15 +165,66 @@ def profile_view(request, username):
 
 @login_required
 def notifications_list(request):
-    notifications = request.user.notifications.all()
-    return render(
-        request, "accounts/notifications.html", {"notifications": notifications}
-    )
+    qs = request.user.notifications.all()
+    return render(request, "accounts/notifications_list.html", {"notifications": qs})
 
 
 @login_required
 def notification_mark_read(request, pk):
     n = get_object_or_404(request.user.notifications, pk=pk)
-    n.read = True
+    n.is_read = True
     n.save()
-    return redirect("notifications")
+    return redirect("notifications_list")
+
+
+# فقط مدیر می‌تواند اعلان ایجاد کند
+# create / edit / delete — only staff
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def notification_create(request):
+    if request.method == "POST":
+        form = NotificationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "اعلان ایجاد شد.")
+            return redirect("notifications_list")
+    else:
+        form = NotificationForm()
+
+    # اگر فرم معتبر نباشد، باز هم باید فرم را دوباره نمایش دهیم
+    return render(request, "accounts/notification_form.html", {"form": form})
+
+
+@user_passes_test(lambda u: u.is_staff)
+def notification_edit(request, pk):
+    notif = get_object_or_404(Notification, pk=pk)
+    if request.method == "POST":
+        form = NotificationForm(request.POST, instance=notif)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "اعلان به‌روز شد.")
+            return redirect("notifications_list")
+    else:
+        form = NotificationForm(instance=notif)
+    return render(
+        request, "accounts/notification_form.html", {"form": form, "notif": notif}
+    )
+
+
+@user_passes_test(lambda u: u.is_staff)
+def notification_delete(request, pk):
+    notif = get_object_or_404(Notification, pk=pk)
+    if request.method == "POST":
+        notif.delete()
+        messages.success(request, "اعلان حذف شد.")
+        return redirect("notifications_list")
+    return render(
+        request, "accounts/notification_confirm_delete.html", {"notif": notif}
+    )
+
+
+def dashboard_notifications(request):
+    notifications = Notification.objects.filter(user=request.user)
+    return render(
+        request, "accounts/notifications_list.html", {"notifications": notifications}
+    )
