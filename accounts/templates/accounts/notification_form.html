@@ -1,10 +1,26 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>{% if edit %}ویرایش اعلان{% else %}ایجاد اعلان جدید{% endif %}</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-success">{% if edit %}ذخیره{% else %}ایجاد{% endif %}</button>
-    <a href="{% url 'notifications_list' %}" class="btn btn-secondary">انصراف</a>
-</form>
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-warning text-dark">
+            <h2>{% if edit %}ویرایش اعلان{% else %}ایجاد اعلان جدید{% endif %}</h2>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                    {% for field in form %}
+                        <div class="mb-3">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        <div class="text-danger small">{{ field.errors }}</div>
+                        </div>
+                    {% endfor %}
+                <button type="submit" class="btn btn-success">{% if edit %}ذخیره{% else %}ایجاد{% endif %}</button>
+            </form>
+                <a href="{% url 'notifications_list' %}" class="btn btn-secondary">انصراف</a>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

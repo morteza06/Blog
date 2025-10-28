@@ -92,6 +92,13 @@ class Notification(models.Model):
         ("comment", "کامنت"),
         ("post", "پست"),
     ]
+    ICON_TYPE_CHOICES = [
+        ("bi-bell", "زنگوله"),
+        ("bi-chat", "گفتگو"),
+        ("bi-heart", "قلب"),
+        ("bi-check-circle", "تایید "),
+        ("bi-exclamation-circle", "هشدار"),
+    ]
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications"
     )
@@ -100,6 +107,7 @@ class Notification(models.Model):
     notif_type = models.CharField(
         choices=NOTIF_TYPE_CHOICES, max_length=20, default="info"
     )
+    icon = models.CharField(choices=ICON_TYPE_CHOICES, max_length=30, default="bi-bell")
     created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
 

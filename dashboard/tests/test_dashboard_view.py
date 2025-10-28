@@ -14,4 +14,4 @@ def test_dashboard_for_logged_in_user(client, django_user_model):
     client.login(username="test", password="12345")
     response = client.get(reverse("dashboard"))
     assert response.status_code == 200
-    assert b"Dashboard" in response.content
+    assert "داشبورد" in response.content or b"Dashboard" in response.content

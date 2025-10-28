@@ -21,16 +21,18 @@ def dashboard(request):
     """
 
     user = request.user
-    # استفاده از فرم با modal form
-    # form = ProfileEditForm(request.POST or None, request.FILES or None, instance=user)
+    q = request.GET.get("q", "").strip()  # مقدار فیلد جستجو
     greeting = _get_greeting()
-    postsqs = Post.objects.filter(author=user)
+    postsqs = Post.objects.filter(author=user).order_by("-created_at")
+    if q:
+        postsqs = postsqs.filter(title__icontains=q)
+    notifications = Notification.objects.filter(user=request.user)
     total_posts = postsqs.count()
     last_post = postsqs.order_by("-created_at").first()
     # تعداد کل پست‌ها
-    total_posts = user.posts.filter(author=user).count()
     # آخرین پست‌های نویسنده (۵ تا)
-    recent_posts = user.posts.all().order_by("-created_at")[:5]
+    recent_posts = postsqs
+    # user.posts.all().order_by("-created_at")[:10]
     recent_comments = Comment.objects.filter(author=user).order_by("-created_at")[:5]
     # ساخت داده برای گراف
     post_stats_qs = (
@@ -71,18 +73,12 @@ def dashboard(request):
         activities.append(
             {
                 "type": "notif",
+                "icon": n.icon,
                 "title": n.title,
                 "created_at": n.created_at,
                 "message": n.message,
             }
         )
-
-    # # اعلان‌ها — بعداً از مدل Notification خوانده می‌شود
-    # notifications = [
-    #     {"message": "پیام جدید از مدیر", "time": "۱ دقیقه پیش"},
-    #     {"message": "پست شما تأیید شد", "time": "۱۰ دقیقه پیش"},
-    # ]
-
     context = {
         "greeting": greeting,
         "user": user,
@@ -97,6 +93,7 @@ def dashboard(request):
         "notifications": notifications,
         "activities": activities,
         "post_stats": post_stats,  # ← این مقدار به قالب می‌رود
+        "query": q,
     }
     return render(request, "accounts/dashboard.html", context)
 
@@ -199,6 +196,9 @@ def notification_create(request):
 def notification_edit(request, pk):
     notif = get_object_or_404(Notification, pk=pk)
     if request.method == "POST":
+        if request.user != notif.user and not request.user.is_superuser:
+            messages.error(request, "شما مجاز به ویرایش این اعلان نیستید.")
+            return redirect("dashboard")
         form = NotificationForm(request.POST, instance=notif)
         if form.is_valid():
             form.save()

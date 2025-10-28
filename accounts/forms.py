@@ -189,7 +189,7 @@ class ProfileEditForm(forms.ModelForm):
 class NotificationForm(forms.ModelForm):
     class Meta:
         model = Notification
-        fields = ["user", "title", "message", "notif_type"]
+        fields = ["user", "title", "message", "icon", "notif_type"]
         widgets = {
             "user": forms.Select(attrs={"class": "form-select"}),
             "title": forms.TextInput(
@@ -199,10 +199,12 @@ class NotificationForm(forms.ModelForm):
                 attrs={"class": "form-control", "placeholder": "پیام اعلان", "rows": 3}
             ),
             "notif_type": forms.Select(attrs={"class": "form-select"}),
+            "icon": forms.Select(attrs={"class": "form-select"}),
         }
         labels = {
             "user": "گیرنده",
             "title": "عنوان",
             "message": "پیام",
             "notif_type": "نوع اعلان",
+            "icon": "آیکون",
         }

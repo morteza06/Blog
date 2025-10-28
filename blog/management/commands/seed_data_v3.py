@@ -55,6 +55,7 @@ class Command(BaseCommand):
                     "content": f"This is the sample content of post number {i}. " * 3,
                     "created_at": timezone.now(),
                     "published_at": timezone.now(),
+                    "is_published": True,
                     "status": "published",
                 },
             )

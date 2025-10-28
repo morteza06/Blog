@@ -23,6 +23,27 @@
 {% load static %}
 
 {% block content %}
+<h6>داشبورد</h6>
+<h4>جستجو:</h4>
+<div>
+    <form method="get" action="{% url 'dashboard' %}" class="position-relative mb-3" style="max-width: 400px;">
+    <input type="text"
+            name="q"
+            value="{{ request.GET.q }}"
+            placeholder="🔍 جستجو در عنوان پست‌ها..."
+            class="form-control pe-5"
+            id="searchInput">
+
+    <!-- دکمه × پاک‌کردن -->
+    <button type="button"
+            id="clearBtn"
+            class="btn btn-sm btn-light border-0 position-absolute end-0 top-50 translate-middle-y me-2"
+            style="display: none;">
+        ❌
+    </button>
+    </form>
+</div>
+<!-- container -->
 <div class="container mt-4 ">
     <!-- نمایش پیام ها  -->
     {% if messages %}
@@ -45,7 +66,6 @@
     </div>
 
     <div class="row">
-
         <!-- پروفایل کاربر -->
         <div class="col-lg-4 col-md-6">
             <div class="card shadow-sm p-3 h-100 border-primary">
@@ -71,7 +91,6 @@
 
             </div>
         </div>
-
        <!-- آمار فعالیت‌ها -->
         <div class="col-lg-4 col-md-6">
             <div class="card shadow-sm p-3 h-100 border-success">
@@ -89,8 +108,6 @@
                 </ul>
             </div>
         </div>
-
-
         <!-- اعلان‌ها -->
         <div class="col-lg-4 col-md-12">
             <div class="card shadow-sm h-100 border-warning">
@@ -99,7 +116,9 @@
                         <i class="bi bi-bell me-2" style="font-size:1.5rem;"></i>
                         <h4 class="m-0">اعلان‌ها 🔔</h4>
                     </div>
-                    <a href="{% url 'notification_create' %}" class="btn btn-sm btn-success">➕ ایجاد اعلان</a>
+                    {% if  request.user.is_superuser %}
+                        <a href="{% url 'notification_create' %}" class="btn btn-sm btn-success">➕ ایجاد اعلان</a>
+                    {% endif %}
                 </div>
 
                 <!-- محدوده قابل اسکرول -->
@@ -114,9 +133,9 @@
                             {% if n.notif_type == 'comment' %}list-group-item-light{% endif %}
                             position-relative">
 
-                            <div class="d-flex justify-content-between align-items-start">
+                            <div class="d-flex align-items-start">
+                                <i class="bi {{ n.icon }} me-2"></i>
                                 <div class="d-flex align-items-start">
-                                    <i class="bi {{ n.icon }} me-2"></i>
                                     <div>
                                         <strong>{{ n.title }}</strong><br>
                                         <small>{{ n.message|truncatechars:30 }}</small>
@@ -129,10 +148,13 @@
                                 {% endif %}
                             </div>
 
-                            <div class="mt-2 d-flex justify-content-end gap-2">
+                            {% if  request.user.is_superuser %}
+                                <div class="mt-2 d-flex justify-content-end gap-2">
                                 <a href="{% url 'notification_edit' n.id %}" class="btn btn-outline-secondary btn-sm">ویرایش</a>
-                                <a href="{% url 'notification_delete' n.id %}" class="btn btn-outline-danger btn-sm">حذف</a>
-                            </div>
+                                    <a href="{% url 'notification_delete' n.id %}" class="btn btn-outline-danger btn-sm">حذف</a>
+                                </div>
+                            {% endif %}
+
                         </li>
                         {% empty %}
                         <li class="list-group-item text-center text-muted">هیچ اعلانی ندارید.</li>
@@ -145,43 +167,43 @@
                 </div>
             </div>
         </div>
-
     </div> <!-- row -->
 
     <div class="row g-3 mt-3">
-
-
           <!-- پست‌ها -->
         <div class="col-lg-8">
             <div class="card shadow-sm h-100 border-secondary list-gruoup list-group-flush " style="max-height: 400px; overflow-y: auto">
                 <div class="card-header d-flex justify-content-between align-items-center bg-secondary text-white">
-                    <h5><i class="bi bi-pencil-square me-2"></i>پست‌های شما</h5>
+                    <h5><i class="bi bi-pencil-square me-2"></i>پست‌ها</h5>
+                    <a href="{% url 'blog:post_list'%}">پست های سایت🆓</a>
                     <a href="{% url 'blog:post_create' %}" class="btn btn-sm btn-success">➕ پست جدید</a>
                 </div>
                 <div class="card-body">
                     {% if recent_posts %}
                     <ul class="list-group list-group-flush">
                         {% for post in recent_posts %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <a href="{% url 'blog:post_detail' post.slug %}"><strong>{{ post.title }}</strong></a><br>
-                                        <small class="text-muted">{{ post.created_at|date:"Y-m-d H:i" }}</small>
-                                    </div>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <a href="{% url 'blog:post_detail' post.slug %}"><strong>{{ post.title }}</strong></a><br>
+                                            <small class="text-muted">{{ post.created_at|date:"Y-m-d H:i" }}</small>
+                                </div>
+                                {% if  request.user == post.author %}
                                     <a href="{% url 'blog:post_edit' post.slug %}" class="btn btn-outline-secondary btn-sm">
-                                        <i class="bi bi-pencil-square"></i> ویرایش
+                                       ✏️  ویرایش
                                     </a>
-                                </li>
-                                {% endfor %}
-                            </ul>
-                            {% else %}
-                            <p class="text-muted text-center">شما هنوز هیچ پستی ننوشته‌اید.</p>
-                            {% endif %}
-                        </div>
-                    </div>
+                                     <a href="{% url 'blog:post_delete' post.slug %}" class="btn btn-sm btn-outline-danger">🗑 حذف</a>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                        <p class="text-muted text-center">شما هنوز هیچ پستی ننوشته‌اید.</p>
+                    {% endif %}
                 </div>
-
-                <!-- فعالیت‌های اخیر -->
-                <div class="col-lg-4 list-gruoup list-group-flush " style="max-height: 400px; overflow-y: auto">
+            </div>
+        </div>
+        <!-- فعالیت‌های اخیر -->
+        <div class="col-lg-4 list-gruoup list-group-flush " style="max-height: 400px; overflow-y: auto">
                     <div class="card shadow-sm p-3 h-100 border-info">
                 <div class="d-flex align-items-center mb-2 text-info">
                     <i class="bi bi-clock-history me-2" style="font-size:1.5rem;"></i>
@@ -192,30 +214,29 @@
                     <li class="list-group-item d-flex justify-content-between align-items-start">
                         <div>
                             {% if act.type == "post" %}
-                            <a href="{{ act.url }}"><strong>{{ act.title }}</strong></a>
-                            <div class="text-muted small">Post • {{ act.created_at|date:"Y-m-d H:i" }}</div>
-                                {% else %}
-                                <strong>{{ act.title }}</strong>
+                                <i class="bi bi-pencil-square me-2"></i>
+                                <a href="{{ act.url }}">
+                                <strong >{{ act.title }}</strong></a>
+                                <div class="text-muted small">پست • {{ act.created_at|date:"Y-m-d H:i" }}</div>
+                            {% elif act.type == "notif" %}
+                                <i class="bi {{ act.icon }} me-2"></i>
+                                <strong>{{act.notif}}{{ act.title }}</strong>
                                 <div class="text-muted small">{{ act.message|truncatechars:120 }}</div>
-                                    <div class="text-muted small">{{ act.created_at|date:"Y-m-d H:i" }}</div>
-                                    {% endif %}
-                                </div>
-                            </li>
+                                <div class="text-muted small ">اعلان•{{ act.created_at|date:"Y-m-d H:i" }}</div>
+                            {% endif %}
+                        </div>
+                    </li>
                     {% endfor %}
                 </ul>
             </div>
         </div>
-
         <!-- نمودار فعالیت های ماهانه -->
          <div class="card shadow-sm mt-3 p-3 border-info">
              <h5><i class="bi bi-bar-chart-line me-2"></i>نمودار فعالیت ماهانه</h5>
              <canvas id="activityChart" width="400" height="200"></canvas>
             </div>
-
-
         </div> <!-- row -->
-
-    </div> <!-- container -->
+</div> <!-- container -->
 
 
 
@@ -245,6 +266,27 @@
     });
 </script>
 
+<!-- کلید پاک کردن فرم جستجو -->
+<script>
+  const input = document.getElementById("searchInput");
+  const clearBtn = document.getElementById("clearBtn");
 
+  // اگر مقداری در input هست، دکمه × را نمایش بده
+  if (input.value.trim() !== "") {
+      clearBtn.style.display = "block";
+  }
+
+  // هنگام تایپ کردن، دکمه × را نشان یا پنهان کن
+  input.addEventListener("input", () => {
+      clearBtn.style.display = input.value.trim() !== "" ? "block" : "none";
+  });
+
+  // وقتی روی × کلیک شد، مقدار را پاک کن و فرم را ارسال کن تا همه پست‌ها نشان داده شوند
+  clearBtn.addEventListener("click", () => {
+      input.value = "";
+      clearBtn.style.display = "none";
+      input.form.submit(); // فرم را بفرست تا فیلتر پاک شود
+  });
+</script>
 
 {% endblock %}

@@ -4,6 +4,7 @@ from django.core.paginator import Paginator
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 
 from accounts.models import Notification
 
@@ -84,6 +85,18 @@ def post_create(request):
             post = form.save(commit=False)
             post.author = request.user
             # تنظیم تاریخ/slug و ... بر اساس مدل شما
+            post = form.save(commit=False)
+            post.author = request.user
+
+            # اگر کاربر می‌خواهد پست منتشر شود
+            if form.cleaned_data.get("is_published"):
+                post.is_published = True
+                post.published_at = timezone.now()
+                post.status = "published"
+            else:
+                post.is_published = False
+                post.status = "draft"
+
             post.save()
             form.save_m2m()
             messages.success(request, "پست جدید ایجاد شد.")

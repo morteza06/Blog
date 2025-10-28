@@ -20,3 +20,22 @@ def test_dashboard_shows_recent_posts_and_notifications(client, django_user_mode
     assert resp.status_code == 200
     assert b"Post 0" in resp.content or b"Post 1" in resp.content
     assert b"Sys msg" in resp.content
+
+
+@pytest.mark.django_db
+def test_dashboard_messages(client, django_user_model):
+    django_user_model.objects.create_user(username="test", password="123")
+    client.login(username="test", password="123")
+
+    # ایجاد یک پیام
+    from django.contrib import messages
+    from django.contrib.messages.storage.fallback import FallbackStorage
+
+    request = client.request().wsgi_request
+    setattr(request, "session", {})
+    messages_storage = FallbackStorage(request)
+    setattr(request, "_messages", messages_storage)
+    messages.success(request, "تست پیام موفقیت")
+
+    response = client.get(reverse("dashboard"))
+    assert "تست پیام موفقیت" in response.content.decode()

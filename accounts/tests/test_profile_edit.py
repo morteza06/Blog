@@ -30,7 +30,7 @@ def test_profile_edit_post(client, django_user_model):
     )
     client.force_login(user)
 
-    url = reverse("dashboard")
+    url = reverse("dashboard")  # ← URL همان داشبورد است
     data = {
         "first_name": "Ali",
         "last_name": "Rezaei",

@@ -2,7 +2,8 @@ from django.conf import settings
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.text import slugify
+
+from .utils import unique_slugify
 
 
 class Tag(models.Model):
@@ -11,7 +12,7 @@ class Tag(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            self.slug = unique_slugify(self, self.name)
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -42,24 +43,26 @@ class Post(models.Model):
         ordering = ["-created_at"]
 
     def save(self, *args, **kwargs):
+        if not self.slug:
+            unique_slugify(self, self.title)
         # اگر is_published تنظیم شده ولی published_at خالی است، اکنون را ست کن
         if self.is_published and not self.published_at:
             self.published_at = timezone.now()
-        if not self.slug:
-            self.slug = slugify(self.title)
+            # هنگام save() اگر slug خالی بود از عنوان slug می‌سازد و در صورت تکرار، عدد الحاق می‌کند تا یکتا شود.
         super().save(*args, **kwargs)
 
     def publish(self):
         """تغییر وضعیت پست به منتشر شده"""
         self.status = "published"
+        self.is_published = True
         self.published_at = timezone.now()
         self.save()
 
-    def __str__(self):
-        return self.title
-
     def get_absolute_url(self):
         return reverse("blog:post_detail", args=[self.slug])
+
+    def __str__(self):
+        return self.title
 
 
 class Comment(models.Model):
