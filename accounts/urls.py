@@ -18,7 +18,12 @@ urlpatterns = [
     path("dashboard/", views.dashboard, name="dashboard"),
     path("profile/edit/", views.profile_edit, name="profile_edit"),
     path("profile/<str:username>/", views.profile_view, name="profile"),
-    path("notifications/list/", views.notifications_list, name="notifications_list"),
+    path("notifications/", views.notification_dashboard, name="notification_dashboard"),
+    path(
+        "notifications/manger/",
+        views.notification_dashboard,
+        name="notification_manager",
+    ),
     path(
         "notifications/create/", views.notification_create, name="notification_create"
     ),

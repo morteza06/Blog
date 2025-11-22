@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>📬 اعلان‌های شما</h2>
+  {% for n in notifications %}
+    <div class="alert list-group d-flex align-items-left mb-2 " style="direction: rtl;">
+      <li class="list-group-item
+        {% if n.notif_type == 'success' %}list-group-item-success{% endif %}
+        {% if n.notif_type == 'warning' %}list-group-item-warning{% endif %}
+        {% if n.notif_type == 'error' %}list-group-item-danger{% endif %}
+        {% if n.notif_type == 'info' %}list-group-item-info{% endif %}
+        {% if n.notif_type == 'comment' %}list-group-item-light{% endif %}
+        ">
+        <i class="bi {{ n.icon }} me-2"></i>
+          <strong>{{ n.title }}</strong><br> — {{ n.message|truncatechars:80  }}
+          <br>
+          <strong>تاریخ ایجاد:</strong><small class="text-muted">{{ n.created_at|date:"Y/m/d H:i" }}</small><br>
+
+          {% if not n.is_read %}
+          <a href="{% url 'notification_mark_read' n.pk %}" class="btn btn-sm btn-outline-primary float-end">علامت خوانده شده</a>
+          {% endif %}
+    </div>
+    </li>
+      {% empty %}
+      <p class="text-muted">هیچ اعلانی ندارید.</p>
+      {% endfor %}
+</div>
+{% endblock %}

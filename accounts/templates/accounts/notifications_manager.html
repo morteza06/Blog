@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4 alert alert-light d-flex align-items-center">
+  <h2 class="mb-3">📢 اعلان‌ها برای همه کاربران</h2>
+  <div>
+    <ul class="list-group">
+      {% for n in users %}
+      <div>
+        <li class="list-group-item
+        {% if n.notif_type == 'success' %}list-group-item-success{% endif %}
+        {% if n.notif_type == 'warning' %}list-group-item-warning{% endif %}
+        {% if n.notif_type == 'error' %}list-group-item-danger{% endif %}
+        {% if n.notif_type == 'info' %}list-group-item-info{% endif %}
+        {% if n.notif_type == 'comment' %}list-group-item-light{% endif %}
+        "></li>
+        <div>
+          <i class="bi {{ n.icon }} me-2"></i>  <!--آیکون -->
+          <strong>{{ n.username }}</strong>
+          <small class="text-muted">({{ u.email }})</small>
+        </div>
+        <a href="{% url 'notification_create' %}" class="btn btn-sm btn-success">➕ ایجاد اعلان</a>
+      </div>
+      <div>
+          عنوان:<strong>{{ n.title }}</strong><br>   متن پیام: <strong> {{ n.message }} </strong>
+
+          <small class="text-muted">({{ n.created_at|date:"Y-m-d H:i" }})</small>
+          <div>
+            {% if not n.is_read %}
+              <a href="{% url 'notification_mark_read' n.pk %}" class="btn btn-sm btn-outline-primary float-end">علامت خوانده شده</a>
+            {% endif %}
+              <div>
+                <a href="{% url 'notification_edit' n.id %}" class="btn btn-sm btn-outline-primary">ویرایش</a>
+                <a href="{% url 'notification_delete' n.id %}" class="btn btn-sm btn-outline-danger">حذف</a>
+              </div>
+          </div>
+          {% empty %}
+        </li>
+        <li class="list-group-item text-center text-muted">هنوز اعلانی وجود ندارد.</li>
+      </div>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}

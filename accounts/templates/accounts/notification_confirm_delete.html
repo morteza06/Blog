@@ -5,6 +5,6 @@
 <form method="post">
     {% csrf_token %}
     <button type="submit" class="btn btn-danger">حذف</button>
-    <a href="{% url 'notifications_list' %}" class="btn btn-secondary">انصراف</a>
+    <a href="{% url 'notifications_dashboard' %}" class="btn btn-secondary">انصراف</a>
 </form>
 {% endblock %}

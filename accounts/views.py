@@ -124,6 +124,11 @@ def signup(request):
 User = get_user_model()
 
 
+# فقط مدیر بتواند وارد شود
+def is_admin(user):
+    return user.is_superuser or user.is_staff
+
+
 @login_required
 def profile_edit(request):
     user = request.user
@@ -161,9 +166,20 @@ def profile_view(request, username):
 
 
 @login_required
-def notifications_list(request):
-    qs = request.user.notifications.all()
-    return render(request, "accounts/notifications_list.html", {"notifications": qs})
+def notifications_dashboard(request):
+    # user = request.user
+    # فقط مدیر و کارمند بتوانند کل فهرست کاربران و اعلان‌ها را ببینند
+    # if not (user.is_staff and user.is_superuser):
+    #     # کاربر معمولی فقط اعلان‌های خودش را می‌بیند
+    #     notifications = Notification.objects.filter(user=user).order_by('-created_at')
+    #     return render(request, 'notifications/notifications_dashboard.html', {'notifications': notifications})
+
+    # مدیر یا کارمند: فهرست همه کاربران و اعلان‌هایشان
+    print("alreeeeeeeeeeet")
+    users = User.objects.all().prefetch_related("notifications")
+    print("admin mod- user:", users.count())
+    context = {"users": users}
+    return render(request, "notifications/notifications_manager.html", context)
 
 
 @login_required
@@ -171,7 +187,7 @@ def notification_mark_read(request, pk):
     n = get_object_or_404(request.user.notifications, pk=pk)
     n.is_read = True
     n.save()
-    return redirect("notifications_list")
+    return redirect("notifications_dashboard")
 
 
 # فقط مدیر می‌تواند اعلان ایجاد کند
@@ -184,7 +200,7 @@ def notification_create(request):
         if form.is_valid():
             form.save()
             messages.success(request, "اعلان ایجاد شد.")
-            return redirect("notifications_list")
+            return redirect("notifications_dashboard")
     else:
         form = NotificationForm()
 
@@ -203,7 +219,7 @@ def notification_edit(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, "اعلان به‌روز شد.")
-            return redirect("notifications_list")
+            return redirect("notifications_dashboard")
     else:
         form = NotificationForm(instance=notif)
     return render(
@@ -217,14 +233,16 @@ def notification_delete(request, pk):
     if request.method == "POST":
         notif.delete()
         messages.success(request, "اعلان حذف شد.")
-        return redirect("notifications_list")
+        return redirect("notifications_dashboard")
     return render(
         request, "accounts/notification_confirm_delete.html", {"notif": notif}
     )
 
 
-def dashboard_notifications(request):
+def notification_dashboard(request):
     notifications = Notification.objects.filter(user=request.user)
     return render(
-        request, "accounts/notifications_list.html", {"notifications": notifications}
+        request,
+        "accounts/notifications_dashboard.html",
+        {"notifications": notifications},
     )
